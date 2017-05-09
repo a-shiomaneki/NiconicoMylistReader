@@ -19,8 +19,8 @@ function testGetMyListIds()
 function getAllData()
 {
   var ids=getMyListIds();
-  for(var i in ids)
-  {
+  for(var i in ids)  {
+
     fetchData(i);
   }
 }
@@ -31,8 +31,8 @@ function getMyListIds()
   var idCol=getColByValue(sheet,"マイリストID");
   var lastDateCol=getColByValue(sheet,"最終取得日");
   var maxCol=Math.max(idCol,lastDateCol);
-  var maxRow=getRowByValue(sheet,"");
-  var range=sheet.getRange(2,1,maxRow,maxCol);
+  var maxRow=getRowByValue(sheet,"")-1;
+  var range=sheet.getRange(2,1,maxRow-1,maxCol);
   var vls =range.getValues();
   
   var ret={};
@@ -47,9 +47,16 @@ function fetchData(id){
   var sheet = SpreadsheetApp.getActive().getSheetByName(id);
   var mylist = sheet.getName();
   var url = "http://www.nicovideo.jp/mylist/"+mylist+"?rss=atom";
-  var response = UrlFetchApp.fetch(url);
-  var xml = Xml.parse(response.getContentText(), false);
-  var els = xml.getElement().getElements("entry");
+  try{
+    var response = UrlFetchApp.fetch(url);
+  } catch(e) {
+    var error=e;
+    Logger.log(error);
+    return error;
+  }
+  var xml = XmlService.parse(response.getContentText());
+  var atom = XmlService.getNamespace('http://www.w3.org/2005/Atom');
+  var els = xml.getRootElement().getChildren('entry',atom);
   
   var colNames = ["マイリスト登録時間","タイトル","サムネ","投稿","長さ","再生","マイリス","URL","id","投稿者","タグ"];
   for(var i=0;i<colNames.length;i++) {
@@ -59,26 +66,26 @@ function fetchData(id){
   var curRow=2;
   for(var i = 0;i < els.length;i++){
     var el = els[i];
-    var title = el.getElement("title").getText();
-    var updated = el.getElement("updated").getText();
-    var content = el.getElement("content").getText();
-    var link = el.getElement("link").getAttribute("href").getValue();
+    var title = el.getChild("title",atom).getText();
+    var updated = el.getChild("updated",atom).getText();
+    var content = el.getChild("content",atom).getText();
+    var link = el.getChild("link",atom).getAttribute("href").getValue();
     var id = link.slice(30);
       
     var mvUrl = "http://ext.nicovideo.jp/api/getthumbinfo/"+id;
     var mvResponse = UrlFetchApp.fetch(mvUrl);
-    var mvXml = Xml.parse(mvResponse.getContentText(), false);
-    var status = mvXml.getElement().getAttribute("status").getValue();
+    var mvXml = XmlService.parse(mvResponse.getContentText());
+    var status = mvXml.getRootElement().getAttribute("status").getValue();
     
     if( status == "ok" ) {
-      var thumb = mvXml.getElement().getElement("thumb");
-      var tags = thumb.getElement("tags").getElements("tag");
-      var nickname = thumb.getElement("user_nickname").getText();
-      var thumbnail = thumb.getElement("thumbnail_url").getText();
-      var view = thumb.getElement("view_counter").getText();
-      var mylist = thumb.getElement("mylist_counter").getText();
-      var first = thumb.getElement("first_retrieve").getText();
-      var length = thumb.getElement("length").getText();
+      var thumb = mvXml.getRootElement().getChild("thumb");
+      var tags = thumb.getChild("tags").getChildren("tag");
+      var nickname = thumb.getChild("user_nickname").getText();
+      var thumbnail = thumb.getChild("thumbnail_url").getText();
+      var view = thumb.getChild("view_counter").getText();
+      var mylist = thumb.getChild("mylist_counter").getText();
+      var first = thumb.getChild("first_retrieve").getText();
+      var length = thumb.getChild("length").getText();
       
       for(var j = 0; j < tags.length; j++) {
         sheet.getRange(curRow,1).setValue(updated);
