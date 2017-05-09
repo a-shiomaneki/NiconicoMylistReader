@@ -4,7 +4,7 @@ function onOpen() {
     name : "取り込み",
     functionName : "getAllData"
   }];
-  spreadsheet.addMenu("メニュー", entries);
+  spreadsheet.addMenu("スクリプト", entries);
 };
 
 function testGetMyListIds()
@@ -19,28 +19,15 @@ function testGetMyListIds()
 function getAllData()
 {
   var ids=getMyListIds();
-  for(var i in ids)  {
-
-    fetchData(i);
-  }
+  ids.forEach(fetchData);
 }
 
 function getMyListIds()
 {
   var sheet=SpreadsheetApp.getActive().getSheetByName("マイリスト情報");
-  var idCol=getColByValue(sheet,"マイリストID");
-  var lastDateCol=getColByValue(sheet,"最終取得日");
-  var maxCol=Math.max(idCol,lastDateCol);
-  var maxRow=getRowByValue(sheet,"")-1;
-  var range=sheet.getRange(2,1,maxRow-1,maxCol);
-  var vls =range.getValues();
-  
-  var ret={};
-  for each(var v in vls)
-  {
-    ret[v[idCol-1]]=v[lastDateCol-1];
-  }
-  return ret;      
+  var values = sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues().map(function(v){return v[0];});
+
+  return values;
 }
 
 function fetchData(id){
@@ -59,13 +46,10 @@ function fetchData(id){
   var els = xml.getRootElement().getChildren('entry',atom);
   
   var colNames = ["マイリスト登録時間","タイトル","サムネ","投稿","長さ","再生","マイリス","URL","id","投稿者","タグ"];
-  for(var i=0;i<colNames.length;i++) {
-    sheet.getRange(1,1+i).setValue(colNames[i]);
-  }  
+  sheet.getRange(1,1,1,colNames.length).setValues([colNames]);
   
-  var curRow=2;
-  for(var i = 0;i < els.length;i++){
-    var el = els[i];
+  var rows=[];
+  els.forEach(function(el,i){
     var title = el.getChild("title",atom).getText();
     var updated = el.getChild("updated",atom).getText();
     var content = el.getChild("content",atom).getText();
@@ -76,7 +60,6 @@ function fetchData(id){
     var mvResponse = UrlFetchApp.fetch(mvUrl);
     var mvXml = XmlService.parse(mvResponse.getContentText());
     var status = mvXml.getRootElement().getAttribute("status").getValue();
-    
     if( status == "ok" ) {
       var thumb = mvXml.getRootElement().getChild("thumb");
       var tags = thumb.getChild("tags").getChildren("tag");
@@ -86,48 +69,12 @@ function fetchData(id){
       var mylist = thumb.getChild("mylist_counter").getText();
       var first = thumb.getChild("first_retrieve").getText();
       var length = thumb.getChild("length").getText();
-      
-      for(var j = 0; j < tags.length; j++) {
-        sheet.getRange(curRow,1).setValue(updated);
-        sheet.getRange(curRow,2).setValue(title);
-        sheet.getRange(curRow,3).setFormula("=image(\""+thumbnail+"\")");
-        sheet.getRange(curRow,4).setValue(first);
-        sheet.getRange(curRow,5).setValue(length);
-        sheet.getRange(curRow,6).setValue(view);
-        sheet.getRange(curRow,7).setValue(mylist);
-        
-        sheet.getRange(curRow,8).setValue(link);
-        sheet.getRange(curRow,9).setValue(id);
-        sheet.getRange(curRow,10).setValue(nickname);
-        var tag = "'"+tags[j].getText();
-        sheet.getRange(curRow,11).setValue(tag);
-        curRow++;
-      }
-    }
 
-  }
+      var p=[updated,title,"=image(\""+thumbnail+"\")",first,length,view,mylist,link,id,nickname];
+      tags.forEach(function(t,j){
+        rows.push(p.concat([t.getText()]));
+      });
+    }
+  });
+  sheet.getRange(2,1,rows.length,rows[0].length).setValues(rows);
 };
-
-function getColByValue(sheet,val) {
-  var range = sheet.getRange("1:1");
-  var values = range.getValues()[0];
-
-  for(var i=0; i<values.length; i++) {
-    if( values[i] == val ) {
-      return i+1;
-    }
-  }
-  return 'undefined';
-}
-
-function getRowByValue(sheet,val) {
-  var range = sheet.getRange("A:A");
-  var values = range.getValues();
-  
-  for(var i=0; i<values.length; i++) {
-    if( values[i][0] == val ) {
-      return i+1;
-    }
-  }
-  return 'undefined';
-}
