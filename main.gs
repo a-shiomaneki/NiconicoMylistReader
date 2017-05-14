@@ -15,25 +15,21 @@ function getListedVideoInfo(){
     
     try{
       var mylist = new Mylist(mylistId);
-      if(  lastUpdate == "" ||  W3CTime.isT2Latest(lastUpdate,mylist.updated()) ){        
-        mylist.videos().forEach(function(aVideo){        
+      if(  lastUpdate == "" ||  W3CTime.isT2Latest(lastUpdate,mylist.updated()) ){
+        var rows = [];        
+        mylist.videos().forEach(function(aVideo){    
+          var row=['updated','title','id','link'].map(function(name){
+            return aVideo[name];
+          });
           var videoDetail = new VideoDetail(aVideo.id);
           var vd = videoDetail.getDetail();
           if( vd.status == 'ok'){
-            var th=v.getChild("thumb");
-            ['thumbnail_url','user_nickname','thumbnail_url','view_counter','mylist_counter','first_retrieve','length'
-            ].forEach(function(name){
-              data[name] = th.getChildText(name);
-            });
-            data.thumbnail_url="=image(\""+data.thumbnail_url+"\")";
+            vd.thumbnail_url="=image(\""+vd.thumbnail_url+"\")";
             // データの並びを整えて１行分のデータとして準備する．
             row = row.concat(['thumbnail_url','first_retrieve','length','view_counter','mylist_counter','user_nickname'].map(function(name){
-              return data[name];
+              return vd[name];
             }));
-         
-            var tags = th.getChild("tags").getChildren("tag").map(function(t){
-              return t.getText();
-            });
+            var tags = videoDetail.getTags();
             if( tags.length > 1 ){
               tags.forEach(function(t){
                 rows.push(row.concat([t]));
@@ -50,7 +46,7 @@ function getListedVideoInfo(){
           }
         });
         setVideoInfos(mylistId,rows);
-        ControlSheet.setResult(i,updated);
+        ControlSheet.setResult(i,mylist.updated());
       }
     }catch(error){
       var e=error;
@@ -125,14 +121,22 @@ VideoDetail.prototype = {
     var detail={};
     detail.status=root.getAttribute('status').getValue();
     if(detail.status=='ok'){
-      var elements=root.getChildren();
+      var elements=root.getChild("thumb").getChildren();
       elements.forEach(function(elem){
-        detail[elem.getName()]=elem.getChildText();
+        detail[elem.getName()]=elem.getText();
       });
     }
     return detail;
   },
+  getTags:function(){
+    var root = this.root;
+    var tags = root.getChild("thumb").getChild('tags').getChildren('tag').map(function(t){
+      return t.getText();
+    });
+    return tags;
+  },
 };
+
 
 function setVideoInfos(id,rows)
 {

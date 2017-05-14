@@ -75,5 +75,12 @@ function myTests() {
     var mylist=new Mylist(23220687);
     ok( mylist.videos() instanceof Array);
   });
-  
+   test("getDetailsのテスト", function() {
+    var mylist=new Mylist(23220687);
+    ok( mylist.videos() instanceof Array);
+  }); 
+  test("getTagsのテスト", function() {
+    var mylist=new Mylist(23220687);
+    ok( mylist.videos() instanceof Array);
+  }); 
 }
