@@ -1,0 +1,9 @@
+{
+  "name": "niconico-mylist-reader",
+  "version": "0.0.0",
+  "description": "NiconicoMylistReader",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  }
+}
