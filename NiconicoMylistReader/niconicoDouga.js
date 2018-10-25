@@ -1,7 +1,7 @@
 var Mylist=function(id){
   this.id=id;
   this.url = "https://www.nicovideo.jp/mylist/"+id+"?rss=atom";
-  this.atom = XmlService.getNamespace('https://www.w3.org/2005/Atom');
+  this.atom = XmlService.getNamespace('http://www.w3.org/2005/Atom');
   this.root=this.getMylist();
 };
 Mylist.prototype={
