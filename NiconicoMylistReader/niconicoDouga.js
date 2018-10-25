@@ -1,7 +1,7 @@
 var Mylist=function(id){
   this.id=id;
-  this.url = "http://www.nicovideo.jp/mylist/"+id+"?rss=atom";
-  this.atom = XmlService.getNamespace('http://www.w3.org/2005/Atom');
+  this.url = "https://www.nicovideo.jp/mylist/"+id+"?rss=atom";
+  this.atom = XmlService.getNamespace('https://www.w3.org/2005/Atom');
   this.root=this.getMylist();
 };
 Mylist.prototype={
@@ -44,7 +44,7 @@ Mylist.prototype={
 
 var VideoDetail=function(id){
   this.id=id;
-  this.url = "http://ext.nicovideo.jp/api/getthumbinfo/"+id;
+  this.url = "https://ext.nicovideo.jp/api/getthumbinfo/"+id;
   this.root=this.getVideo();
 };
 VideoDetail.prototype = {
