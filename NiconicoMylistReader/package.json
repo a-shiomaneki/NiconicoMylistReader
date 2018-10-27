@@ -3,14 +3,18 @@
   "version": "0.0.0",
   "description": "NiconicoMylistReader",
   "main": "app.js",
-  "author": {
-    "name": ""
-  },
+  "author": "",
   "devDependencies": {
     "@google/clasp": "^1.6.3",
     "tslint": "^5.11.0"
   },
   "dependencies": {
-    "@types/google-apps-script": "0.0.31"
-  }
+    "@types/google-apps-script": "^0.0.31",
+    "global": "^4.3.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "ISC"
 }
