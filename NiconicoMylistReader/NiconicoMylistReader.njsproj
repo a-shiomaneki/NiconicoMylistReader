@@ -29,6 +29,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".claspignore">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="appsscript.json" />
     <Content Include="Index.html" />
     <Content Include="package.json" />

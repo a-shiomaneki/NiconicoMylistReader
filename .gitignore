@@ -1,3 +1,4 @@
 ﻿.vs
 .clasp.json
 /NiconicoMylistReader/node_modules
+*.lock
