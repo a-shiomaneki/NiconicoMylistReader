@@ -2,16 +2,15 @@
   "name": "niconico-mylist-reader",
   "version": "0.0.0",
   "description": "NiconicoMylistReader",
-  "main": "app.js",
+  "main": "main.js",
   "author": "",
-  "devDependencies": {
-    "@types/google-apps-script": "0.0.31"
-  },
+  "devDependencies": {},
   "dependencies": {
+    "@types/core-js": "^2.5.0",
     "@types/datejs": "0.0.30",
-    "@types/gapi.client.fusiontables": "^2.0.0",
     "@types/google-apps-script": "0.0.31",
-    "@types/string": "0.0.29"
+    "@types/string": "0.0.29",
+    "help": "^3.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
