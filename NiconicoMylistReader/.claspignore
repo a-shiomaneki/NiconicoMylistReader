@@ -1,1 +1,5 @@
-﻿node_modules/**
+node_modules/**
+*.njsproj
+*.sln
+jsconfig.json
+*.lock
