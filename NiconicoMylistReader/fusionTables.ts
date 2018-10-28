@@ -1,9 +1,14 @@
 namespace FusionTables {
     export interface Table {
-        importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: string };
+        importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
+        insert(resource: { [key: string]: any }): { [key: string]: any };
+    }
+    export interface Query {
+        sql(sql: string): { [key: string]: any };
     }
     export interface FusionTables {
         Table: Table;
+        Query: Query;
     }
 }
 declare var FusionTables: FusionTables.FusionTables;
@@ -32,7 +37,7 @@ function storeData(str: string, dbid: string): void {
                         throw error;
                     }
                 }
-            } while (isDone == false);
+            } while (isDone === false);
 
             Logger.log(error);
             if (error.message.lastIndexOf("try again") > 0) {
@@ -41,43 +46,45 @@ function storeData(str: string, dbid: string): void {
                 throw error;
             }
         }
-    } while (isDone == false);
+    } while (isDone === false);
 }
 
-const videoColTitle = ['updated', 'title', 'id', 'link', 'description', 'thumbnail_url', 'first_retrieve', 'length', 'view_counter', 'comment_num', 'mylist_counter', 'user_nickname', 'tag'];
-const tagColTitle = ['id', 'tag'];
+const videoColTitle: string[] = ["updated", "title", "id", "link", "description",
+    "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
+    "mylist_counter", "user_nickname", "tag"];
+const tagColTitle: string[] = ["id", "tag"];
 function createTable(name: string, columnTitle: string[]): void {
-    let resource = {
+    let resource: { [key: string]: any } = {
         "name": name,
         "isExportable": false,
         "kind": "fusiontables#table",
     };
-    let post = columnTitle.map(function (t: string) {
-        let type;
-        let formatPattern;
+    let post: { [key: string]: any } = columnTitle.map(function (t: string) {
+        let type: string;
+        let formatPattern: string;
         switch (t) {
-            case 'updated':
-            case 'first_retrieve':
-            case 'length':
-                type = 'DATETIME';
-                formatPattern = 'NONE';
+            case "updated":
+            case "first_retrieve":
+            case "length":
+                type = "DATETIME";
+                formatPattern = "NONE";
                 break;
-            case 'link':
-                type = 'STRING';
-                formatPattern = 'STRING_LINK';
+            case "link":
+                type = "STRING";
+                formatPattern = "STRING_LINK";
                 break;
-            case 'thumbnail_url':
-                type = 'STRING';
-                formatPattern = 'STRING_FOUR_LINE_IMAGE';
+            case "thumbnail_url":
+                type = "STRING";
+                formatPattern = "STRING_FOUR_LINE_IMAGE";
                 break;
-            case 'view_counter':
-            case 'mylist_counter':
-                type = 'NUMBER';
-                formatPattern = 'NONE';
+            case "view_counter":
+            case "mylist_counter":
+                type = "NUMBER";
+                formatPattern = "NONE";
                 break;
             default:
-                type = 'STRING';
-                formatPattern = 'NONE';
+                type = "STRING";
+                formatPattern = "NONE";
                 break;
         }
         let c: { [key: string]: string } = {
@@ -88,6 +95,7 @@ function createTable(name: string, columnTitle: string[]): void {
         };
         return c;
     });
+
     resource.columns = post;
     return FusionTables.Table.insert(resource).tableId;
 }
@@ -95,7 +103,7 @@ function createTable(name: string, columnTitle: string[]): void {
 function getUpdatedVideos(key: string, videos): string[] {
     let sql = "SELECT id, updated FROM " + key + ";";
     let rows: string[] = FusionTables.Query.sql(sql).rows;
-    let ids: string[] = {};
+    let ids: string[];
     if (rows != undefined) {
         if (rows.length >= 1) {
             rows.forEach((r) => {
@@ -103,7 +111,7 @@ function getUpdatedVideos(key: string, videos): string[] {
             });
         }
     }
-    let results: Array<string> = [];
+    let results: string[] = [];
     videos.forEach((v) => {
         let id = v["id"];
         let update = ids[id];

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NiconicoMylistReader", "NiconicoMylistReader.njsproj", "{058E6AF4-F2AA-4BC4-BEAA-4DAE5823B4F9}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NiconicoMylistReader", "NiconicoMylistReader.njsproj", "{0F16A0AD-831A-4AE3-80E5-6CFEACC9BE9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{058E6AF4-F2AA-4BC4-BEAA-4DAE5823B4F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{058E6AF4-F2AA-4BC4-BEAA-4DAE5823B4F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{058E6AF4-F2AA-4BC4-BEAA-4DAE5823B4F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{058E6AF4-F2AA-4BC4-BEAA-4DAE5823B4F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F16A0AD-831A-4AE3-80E5-6CFEACC9BE9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F16A0AD-831A-4AE3-80E5-6CFEACC9BE9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F16A0AD-831A-4AE3-80E5-6CFEACC9BE9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F16A0AD-831A-4AE3-80E5-6CFEACC9BE9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9C88741A-8D68-4DE2-A8CD-CE8FDD67B4DF}
+		SolutionGuid = {BF189D1F-2B1E-4E87-BAAF-1D1F24456EEA}
 	EndGlobalSection
 EndGlobal

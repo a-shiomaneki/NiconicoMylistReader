@@ -1,6 +1,7 @@
 /**
  * SpreadSheetを開いたときにメニューを作成する．
  */
+
 function onOpen() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var entries = [{

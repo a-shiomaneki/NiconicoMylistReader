@@ -3,6 +3,7 @@
  * FusionTablesに動画情報を保存する場合に使う
  * トリガーをかける場合の対象メソッドの１つ
  */
+
 function getListedVideoInfoToTable() {
    var controlSheet = new ControlSheet();
   var mylistIds = controlSheet.getMylistIds();

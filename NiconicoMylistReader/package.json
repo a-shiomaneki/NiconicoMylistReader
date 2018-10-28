@@ -3,18 +3,12 @@
   "version": "0.0.0",
   "description": "NiconicoMylistReader",
   "main": "main.js",
-  "author": "",
-  "devDependencies": {},
-  "dependencies": {
-    "@types/core-js": "^2.5.0",
-    "@types/datejs": "0.0.30",
+  "author": {
+    "name": "A.Shiomaneki"
+  },
+  "devDependencies": {
+    "@google/clasp": "^1.6.3",
     "@types/google-apps-script": "0.0.31",
-    "@types/string": "0.0.29",
-    "help": "^3.0.2"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "license": "ISC"
+    "@types/node": "^8.0.14"
+  }
 }
