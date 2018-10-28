@@ -1,9 +1,12 @@
-export module FusionTables {
+namespace FusionTables {
     export interface Table {
         importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: string };
     }
+    export interface FusionTables {
+        Table: Table;
+    }
 }
-
+declare var FusionTables: FusionTables.FusionTables;
 
 function storeData(str: string, dbid: string): void {
     let rowsBlob: GoogleAppsScript.Base.Blob;
@@ -43,7 +46,7 @@ function storeData(str: string, dbid: string): void {
 
 const videoColTitle = ['updated', 'title', 'id', 'link', 'description', 'thumbnail_url', 'first_retrieve', 'length', 'view_counter', 'comment_num', 'mylist_counter', 'user_nickname', 'tag'];
 const tagColTitle = ['id', 'tag'];
-function createTable(name: string, columnTitle: Array<string>): void {
+function createTable(name: string, columnTitle: string[]): void {
     let resource = {
         "name": name,
         "isExportable": false,
