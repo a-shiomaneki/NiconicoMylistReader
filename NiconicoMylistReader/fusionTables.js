@@ -1,57 +1,53 @@
-export module FusionTables {
-    export interface Table {
-        importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: string };
-    }
-}
-
-
-function storeData(str: string, dbid: string): void {
-    let rowsBlob: GoogleAppsScript.Base.Blob;
-    let isDone: boolean = true;
-
+"use strict";
+exports.__esModule = true;
+function storeData(str, dbid) {
+    var rowsBlob;
+    var isDone = true;
     do {
         try {
             rowsBlob = Utilities.newBlob(str, "application/octet-stream");
             FusionTables.Table.importRows(dbid, rowsBlob);
             isDone = true;
             Logger.log("importRows:OK");
-        } catch (error) {
+        }
+        catch (error) {
             do {
                 try {
                     rowsBlob = Utilities.newBlob(str, "application/octet-stream");
                     FusionTables.Table.importRows(dbid, rowsBlob);
                     Logger.log("importRows:OK");
-                } catch (error) {
+                }
+                catch (error) {
                     Logger.log(error);
                     if (error.message.lastIndexOf("try again") > 0) {
                         isDone = false;
-                    } else {
+                    }
+                    else {
                         throw error;
                     }
                 }
             } while (isDone == false);
-
             Logger.log(error);
             if (error.message.lastIndexOf("try again") > 0) {
                 isDone = false;
-            } else {
+            }
+            else {
                 throw error;
             }
         }
     } while (isDone == false);
 }
-
-const videoColTitle = ['updated', 'title', 'id', 'link', 'description', 'thumbnail_url', 'first_retrieve', 'length', 'view_counter', 'comment_num', 'mylist_counter', 'user_nickname', 'tag'];
-const tagColTitle = ['id', 'tag'];
-function createTable(name: string, columnTitle: Array<string>): void {
-    let resource = {
+var videoColTitle = ['updated', 'title', 'id', 'link', 'description', 'thumbnail_url', 'first_retrieve', 'length', 'view_counter', 'comment_num', 'mylist_counter', 'user_nickname', 'tag'];
+var tagColTitle = ['id', 'tag'];
+function createTable(name, columnTitle) {
+    var resource = {
         "name": name,
         "isExportable": false,
-        "kind": "fusiontables#table",
+        "kind": "fusiontables#table"
     };
-    let post = columnTitle.map(function (t: string) {
-        let type;
-        let formatPattern;
+    var post = columnTitle.map(function (t) {
+        var type;
+        var formatPattern;
         switch (t) {
             case 'updated':
             case 'first_retrieve':
@@ -77,7 +73,7 @@ function createTable(name: string, columnTitle: Array<string>): void {
                 formatPattern = 'NONE';
                 break;
         }
-        let c: { [key: string]: string } = {
+        var c = {
             "name": t,
             "type": type,
             "formatPattern": formatPattern,
@@ -88,26 +84,24 @@ function createTable(name: string, columnTitle: Array<string>): void {
     resource.columns = post;
     return FusionTables.Table.insert(resource).tableId;
 }
-
-function getUpdatedVideos(key: string, videos): string[] {
-    let sql = "SELECT id, updated FROM " + key + ";";
-    let rows: string[] = FusionTables.Query.sql(sql).rows;
-    let ids: string[] = {};
+function getUpdatedVideos(key, videos) {
+    var sql = "SELECT id, updated FROM " + key + ";";
+    var rows = FusionTables.Query.sql(sql).rows;
+    var ids = {};
     if (rows != undefined) {
         if (rows.length >= 1) {
-            rows.forEach((r) => {
+            rows.forEach(function (r) {
                 ids[r[0]] = r[1];
             });
         }
     }
-    let results: Array<string> = [];
-    videos.forEach((v) => {
-        let id = v["id"];
-        let update = ids[id];
+    var results = [];
+    videos.forEach(function (v) {
+        var id = v["id"];
+        var update = ids[id];
         if (update == undefined) {
             results.push(v);
         }
     });
-
     return results;
 }
