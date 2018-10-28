@@ -1,6 +1,6 @@
 {
   "name": "niconico-mylist-reader",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "NiconicoMylistReader",
   "main": "main.js",
   "author": {
@@ -10,5 +10,6 @@
     "@google/clasp": "^1.6.3",
     "@types/google-apps-script": "0.0.31",
     "@types/node": "^8.0.14"
-  }
+  },
+  "dependencies": {}
 }

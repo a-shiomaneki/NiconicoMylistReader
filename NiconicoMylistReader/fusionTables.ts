@@ -103,7 +103,7 @@ function createTable(name: string, columnTitle: string[]): void {
 function getUpdatedVideos(key: string, videos): string[] {
     let sql = "SELECT id, updated FROM " + key + ";";
     let rows: string[] = FusionTables.Query.sql(sql).rows;
-    let ids: string[];
+    let ids: { [key: string]: string } = {};
     if (rows != undefined) {
         if (rows.length >= 1) {
             rows.forEach((r) => {

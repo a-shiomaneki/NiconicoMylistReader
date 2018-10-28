@@ -1,4 +1,3 @@
-
 class W3CTime {
     parse(t: string): number {
         let r: string = t.replace(/T/, " ").replace(/-/g, "/").replace(/\+(.*):(.*)/, " GMT+$1$2");
