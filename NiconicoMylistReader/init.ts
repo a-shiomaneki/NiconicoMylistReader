@@ -2,9 +2,9 @@
  * SpreadSheetを開いたときにメニューを作成する．
  */
 
-function onOpen() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var entries = [{
+function onOpen():void {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let entries = [{
     name : "取り込み",
       functionName: "getListedVideoInfoToTable"
   }];

@@ -112,7 +112,7 @@ function getUpdatedVideos(key: string, videos): string[] {
         }
     }
     let results: string[] = [];
-    videos.forEach((v) => {
+    videos.forEach((v: { [key: string]: string }) => {
         let id = v["id"];
         let update = ids[id];
         if (update == undefined) {

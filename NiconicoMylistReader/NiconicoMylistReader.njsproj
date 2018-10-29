@@ -43,10 +43,10 @@
     <TypeScriptCompile Include="myUtility.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="init.js" />
-    <Compile Include="main.js" />
-    <Compile Include="niconicoDouga.js" />
-    <Compile Include="sheet.js" />
+    <Compile Include="init.ts" />
+    <Compile Include="main.ts" />
+    <Compile Include="niconicoDouga.ts" />
+    <Compile Include="sheet.ts" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

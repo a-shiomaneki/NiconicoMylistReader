@@ -1,11 +1,16 @@
-var Mylist = function (id) {
-    this.id = id;
-    this.url = "https://www.nicovideo.jp/mylist/" + id + "?rss=atom";
-    this.atom = XmlService.getNamespace('http://www.w3.org/2005/Atom');
-    this.root = this.getMylist();
-};
-Mylist.prototype = {
-    getMylist: function () {
+class Mylist {
+    id: string;
+    url: string;
+    atom: GoogleAppsScript.XML_Service.Namespace;
+    root: any;
+
+    constructor(id: string) {
+        this.id = id;
+        this.url = "https://www.nicovideo.jp/mylist/" + id + "?rss=atom";
+        this.atom = XmlService.getNamespace("http://www.w3.org/2005/Atom");
+        this.root = this.getMylist();
+    }
+    getMylist() {
         var url = this.url;
         try {
             var response = UrlFetchApp.fetch(url);
@@ -17,14 +22,14 @@ Mylist.prototype = {
             throw e;
         }
         return this.root;
-    },
-    updated: function () {
+    }
+    updated() {
         return this.root.getChildText('updated', this.atom);
-    },
-    title: function () {
+    }
+    title() {
         return this.root.getChildText('title', this.atom);
-    },
-    videos: function () {
+    }
+    videos() {
         var atom = this.atom;
         var root = this.root;
         var entries = root.getChildren('entry', atom);
@@ -40,16 +45,19 @@ Mylist.prototype = {
             infos.push(info);
         });
         return infos;
-    },
-};
+    }
+}
 
-var VideoDetail = function (id) {
-    this.id = id;
-    this.url = "https://ext.nicovideo.jp/api/getthumbinfo/" + id;
-    this.root = this.getVideo();
-};
-VideoDetail.prototype = {
-    getVideo: function () {
+class VideoDetail {
+    id: string;
+    url: string;
+    root: any;
+    constructor(id) {
+        this.id = id;
+        this.url = "https://ext.nicovideo.jp/api/getthumbinfo/" + id;
+        this.root = this.getVideo();
+    }
+    getVideo() {
         var url = this.url;
         try {
             try {
@@ -65,8 +73,8 @@ VideoDetail.prototype = {
             throw e;
         }
         return this.root;
-    },
-    getDetail: function () {
+    }
+    getDetail() {
         var root = this.root;
         var detail = {};
         detail.status = root.getAttribute('status').getValue();
@@ -77,12 +85,12 @@ VideoDetail.prototype = {
             });
         }
         return detail;
-    },
-    getTags: function () {
+    }
+    getTags() {
         var root = this.root;
         var tags = root.getChild("thumb").getChild('tags').getChildren('tag').map(function (t) {
             return t.getText();
         });
         return tags;
-    },
-};
+    }
+}
