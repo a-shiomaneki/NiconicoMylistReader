@@ -2,9 +2,6 @@
 .clasp.json
 /NiconicoMylistReader/node_modules
 *.lock
-/NiconicoMylistReader/obj/Debug/Tsc75e930f6.out
-/NiconicoMylistReader/obj/Debug/NiconicoMylistReader.njsprojAssemblyReference.cache
-/NiconicoMylistReader/obj/Debug/NiconicoMylistReader.njsproj.FileListAbsolute.txt
-/NiconicoMylistReader/obj/Debug
-/NiconicoMylistReader/myUtility.js.map
-/NiconicoMylistReader/fusionTables.js.map
+/NiconicoMylistReader/obj/*
+/NiconicoMylistReader/*.js.map
+
