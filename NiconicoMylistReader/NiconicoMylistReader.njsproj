@@ -5,6 +5,8 @@
     <Name>NiconicoMylistReader</Name>
     <RootNamespace>NiconicoMylistReader</RootNamespace>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+    <JavaScriptTestFramework>mocha</JavaScriptTestFramework>
+    <JavaScriptTestRoot>test</JavaScriptTestRoot>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -41,12 +43,19 @@
     <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="fusionTables.ts" />
     <TypeScriptCompile Include="myUtility.ts" />
+    <TypeScriptCompile Include="test\test-niconicoDouga.ts">
+      <SubType>Code</SubType>
+      <TestFramework>Mocha</TestFramework>
+    </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="init.ts" />
     <Compile Include="main.ts" />
     <Compile Include="niconicoDouga.ts" />
     <Compile Include="sheet.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="test\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
