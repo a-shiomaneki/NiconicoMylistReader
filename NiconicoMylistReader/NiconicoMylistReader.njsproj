@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="onopen.ts" />
     <TypeScriptCompile Include="main.ts" />
-    <Compile Include="niconicodouga.ts" />
+    <TypeScriptCompile Include="niconicodouga.ts" />
     <Compile Include="sheet.ts" />
   </ItemGroup>
   <ItemGroup>

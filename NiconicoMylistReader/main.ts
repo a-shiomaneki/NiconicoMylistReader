@@ -10,13 +10,9 @@ function getListedVideoInfoToTable() {
     let dbInfos = controlSheet.getDbInfos();
     if (dbInfos.videoInfoDb.dbkey === "") {
         dbInfos.videoInfoDb.dbkey = createTable(dbInfos.videoInfoDb.filename,
-                                                videoColTitle);
+            videoColTitle);
+        controlSheet.setDbKeys(dbInfos);
     }
-    //if(dbInfos.tagDb.dbkey==""){
-    //  dbInfos.tagDb.dbkey=createTable(dbInfos.videoInfoDb.filename,tagColTitle);
-    //}
-    controlSheet.setDbKeys(dbInfos);
-
     for (let i = 0; i < mylistIds.length;i++) {
         let mylistId = mylistIds[i].mylistId;
         let lastUpdate = mylistIds[i].lastUpdate;
@@ -53,16 +49,17 @@ function getListedVideoInfoToTable() {
                             return vd[name];
                         }));
                         let tags = videoDetail.getTags();
-                        if (tags.length > 1) {
-                            //rows.push(row.concat(JSON.stringify(tags)));
-                            //rows.push(row.concat(tags.join(",")));
-                            //rows.push(row);
-                            let id = videoDetail.id;
-                            tags.forEach((t) => {
-                                //tagDbRows.push([id,t]);
-                                rows.push(row.concat(t));
-                            });
-                        }
+                        rows.push(row.concat(JSON.stringify(tags)));
+                        //if (tags.length > 1) {
+                        //    //rows.push(row.concat(JSON.stringify(tags)));
+                        //    //rows.push(row.concat(tags.join(",")));
+                        //    //rows.push(row);
+                        //    let id = videoDetail.id;
+                        //    tags.forEach((t) => {
+                        //        //tagDbRows.push([id,t]);
+                        //        rows.push(row.concat(t));
+                        //    });
+                        //}
 
                     } else { // 動画がコミュニティ限定など公開されていない場合
                         let compNum = videoColTitle.length - row.length;
