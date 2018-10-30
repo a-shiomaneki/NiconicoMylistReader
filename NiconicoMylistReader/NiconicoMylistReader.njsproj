@@ -40,7 +40,7 @@
     <Content Include="appsscript.json" />
     <Content Include="package.json" />
     <Content Include="tsconfig.json" />
-    <TypeScriptCompile Include="fusionTables.ts" />
+    <TypeScriptCompile Include="fusiontables.ts" />
     <TypeScriptCompile Include="myutility.ts" />
     <TypeScriptCompile Include="test\test-niconicoDouga.ts">
       <SubType>Code</SubType>

@@ -2,26 +2,37 @@ class Mylist {
     id: string;
     url: string;
     atom: GoogleAppsScript.XML_Service.Namespace;
-    root: any;
+    root: GoogleAppsScript.XML_Service.Element;
 
     constructor(id: string) {
         this.id = id;
         this.url = "https://www.nicovideo.jp/mylist/" + id + "?rss=atom";
-        this.atom = XmlService.getNamespace("http://www.w3.org/2005/Atom");
+        this.atom = this.getAtom();
         this.root = this.getMylist();
     }
-    getMylist() {
-        var url = this.url;
+    getAtom() {
+        let atom: GoogleAppsScript.XML_Service.Namespace;
         try {
-            var response = UrlFetchApp.fetch(url);
-            var xml = XmlService.parse(response.getContentText());
-            this.root = xml.getRootElement();
+            atom = XmlService.getNamespace("http://www.w3.org/2005/Atom");
         } catch (error) {
-            var e = error;
+            let e = error;
             Logger.log(e);
             throw e;
         }
-        return this.root;
+        return atom;
+    }
+    getMylist() {
+        let root: GoogleAppsScript.XML_Service.Element;
+        try {
+            let response = UrlFetchApp.fetch(this.url);
+            let xml = XmlService.parse(response.getContentText());
+            root = xml.getRootElement();
+        } catch (error) {
+            let e = error;
+            Logger.log(e);
+            throw e;
+        }
+        return root;
     }
     updated() {
         return this.root.getChildText('updated', this.atom);
@@ -30,18 +41,16 @@ class Mylist {
         return this.root.getChildText('title', this.atom);
     }
     videos() {
-        var atom = this.atom;
-        var root = this.root;
-        var entries = root.getChildren('entry', atom);
-        var infos = [];
+        let entries = this.root.getChildren('entry', this.atom);
+        let infos = [];
         entries.forEach(function (aEntry) {
-            var info = {};
+            let info = {};
             aEntry.getChildren().forEach(function (elem) {
                 info[elem.getName()] = elem.getText();
             });
-            info.link = aEntry.getChild('link', atom).getAttribute('href').getValue();
-            var posOfDelimiter = info.link.lastIndexOf('/');
-            info.id = info.link.slice(posOfDelimiter + 1);
+            info["link"] = aEntry.getChild('link', this.atom).getAttribute('href').getValue();
+            let posOfDelimiter = info["link"].lastIndexOf('/');
+            info["id"] = info["link"].slice(posOfDelimiter + 1);
             infos.push(info);
         });
         return infos;
@@ -51,35 +60,38 @@ class Mylist {
 class VideoDetail {
     id: string;
     url: string;
-    root: any;
+    root: GoogleAppsScript.XML_Service.Element;
     constructor(id) {
         this.id = id;
         this.url = "https://ext.nicovideo.jp/api/getthumbinfo/" + id;
         this.root = this.getVideo();
     }
     getVideo() {
-        var url = this.url;
+        let url = this.url;
+        let root: GoogleAppsScript.XML_Service.Element;
+        let response: GoogleAppsScript.URL_Fetch.HTTPResponse;
         try {
             try {
-                var response = UrlFetchApp.fetch(url);
+                /* 1st. try*/
+                response = UrlFetchApp.fetch(url);
             } catch (error) {
+                /* 2nd. try*/
                 response = UrlFetchApp.fetch(url);
             }
-            var xml = XmlService.parse(response.getContentText());
-            this.root = xml.getRootElement();
+            let xml = XmlService.parse(response.getContentText());
+            root = xml.getRootElement();
         } catch (error) {
-            var e = error;
+            let e = error;
             Logger.log(e);
             throw e;
         }
-        return this.root;
+        return root;
     }
     getDetail() {
-        var root = this.root;
-        var detail = {};
-        detail.status = root.getAttribute('status').getValue();
-        if (detail.status == 'ok') {
-            var elements = root.getChild("thumb").getChildren();
+        let detail = {};
+        detail["status"] = this.root.getAttribute('status').getValue();
+        if (detail["status"] == 'ok') {
+            let elements = this.root.getChild("thumb").getChildren();
             elements.forEach(function (elem) {
                 detail[elem.getName()] = elem.getText();
             });
@@ -87,8 +99,7 @@ class VideoDetail {
         return detail;
     }
     getTags() {
-        var root = this.root;
-        var tags = root.getChild("thumb").getChild('tags').getChildren('tag').map(function (t) {
+        let tags = this.root.getChild("thumb").getChild('tags').getChildren('tag').map((t) => {
             return t.getText();
         });
         return tags;

@@ -15,7 +15,7 @@ declare var FusionTables: FusionTables.FusionTables;
 
 function storeData(str: string, dbid: string): void {
     let rowsBlob: GoogleAppsScript.Base.Blob;
-    let isDone: boolean = true;
+    let isDone: boolean = false;
 
     do {
         try {
@@ -100,7 +100,7 @@ function createTable(name: string, columnTitle: string[]): void {
     return FusionTables.Table.insert(resource).tableId;
 }
 
-function getUpdatedVideos(key: string, videos): string[] {
+function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
     let sql = "SELECT id, updated FROM " + key + ";";
     let rows: string[] = FusionTables.Query.sql(sql).rows;
     let ids: { [key: string]: string } = {};
@@ -111,7 +111,7 @@ function getUpdatedVideos(key: string, videos): string[] {
             });
         }
     }
-    let results: string[] = [];
+    let results: { [key: string]: string }[];
     videos.forEach((v: { [key: string]: string }) => {
         let id = v["id"];
         let update = ids[id];
