@@ -59,10 +59,11 @@ function createTable(name: string, columnTitle: string[]): string {
         "isExportable": false,
         "kind": "fusiontables#table",
     };
-    let post: { [key: string]: any } = columnTitle.map(function (t: string) {
+    let post: { [key: string]: any } = columnTitle.map(function (name: string) {
         let type: string;
         let formatPattern: string;
-        switch (t) {
+        let columnJsonSchema: string;
+        switch (name) {
             case "updated":
             case "first_retrieve":
             case "length":
@@ -82,17 +83,34 @@ function createTable(name: string, columnTitle: string[]): string {
                 type = "NUMBER";
                 formatPattern = "NONE";
                 break;
+            case "tag":
+                type = "STRING";
+                //formatPattern = "STRING_JSON_LIST";
+                formatPattern = "STRING_JSON_TEXT";
+                columnJsonSchema = "{ \"type\": \"array\" }";
+                break;
             default:
                 type = "STRING";
                 formatPattern = "NONE";
                 break;
         }
-        let c: { [key: string]: string } = {
-            "name": t,
-            "type": type,
-            "formatPattern": formatPattern,
-            "kind": "fusiontables#column"
-        };
+        let c: { [key: string]: string };
+        if (formatPattern.match(/JSON/)) {
+            c = {
+                "kind": "fusiontables#column",
+                "name": name,
+                "type": type,
+                "formatPattern": formatPattern,
+                "columnJsonSchema": columnJsonSchema
+            }
+        } else {
+            c = {
+                "kind": "fusiontables#column",
+                "name": name,
+                "type": type,
+                "formatPattern": formatPattern
+            }
+        }
         return c;
     });
 
