@@ -17,9 +17,9 @@ function getListedVideoInfoToTable() {
     //}
     controlSheet.setDbKeys(dbInfos);
 
-    mylistIds.forEach((r, i) => {
-        let mylistId = r[0];
-        let lastUpdate = r[1];
+    for (let i = 0; i < mylistIds.length;i++) {
+        let mylistId = mylistIds[i].mylistId;
+        let lastUpdate = mylistIds[i].lastUpdate;
         let w3ctime = new W3CTime();
         try {
             let mylist = new Mylist(mylistId);

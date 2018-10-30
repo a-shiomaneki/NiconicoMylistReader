@@ -1,53 +1,67 @@
-function storeData(str, dbid) {
-    var rowsBlob;
-    var isDone = true;
+namespace FusionTables {
+    export interface Table {
+        importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
+        insert(resource: { [key: string]: any }): { [key: string]: any };
+    }
+    export interface Query {
+        sql(sql: string): { [key: string]: any };
+    }
+    export interface FusionTables {
+        Table: Table;
+        Query: Query;
+    }
+}
+declare var FusionTables: FusionTables.FusionTables;
+
+function storeData(str: string, dbid: string): void {
+    let rowsBlob: GoogleAppsScript.Base.Blob;
+    let isDone: boolean = false;
+
     do {
         try {
             rowsBlob = Utilities.newBlob(str, "application/octet-stream");
             FusionTables.Table.importRows(dbid, rowsBlob);
             isDone = true;
             Logger.log("importRows:OK");
-        }
-        catch (error) {
+        } catch (error) {
             do {
                 try {
                     rowsBlob = Utilities.newBlob(str, "application/octet-stream");
                     FusionTables.Table.importRows(dbid, rowsBlob);
                     Logger.log("importRows:OK");
-                }
-                catch (error) {
+                } catch (error) {
                     Logger.log(error);
                     if (error.message.lastIndexOf("try again") > 0) {
                         isDone = false;
-                    }
-                    else {
+                    } else {
                         throw error;
                     }
                 }
             } while (isDone === false);
+
             Logger.log(error);
             if (error.message.lastIndexOf("try again") > 0) {
                 isDone = false;
-            }
-            else {
+            } else {
                 throw error;
             }
         }
     } while (isDone === false);
 }
-var videoColTitle = ["updated", "title", "id", "link", "description",
+
+const videoColTitle: string[] = ["updated", "title", "id", "link", "description",
     "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
     "mylist_counter", "user_nickname", "tag"];
-var tagColTitle = ["id", "tag"];
-function createTable(name, columnTitle) {
-    var resource = {
+const tagColTitle: string[] = ["id", "tag"];
+function createTable(name: string, columnTitle: string[]): string {
+    let resource: { [key: string]: any } = {
         "name": name,
         "isExportable": false,
         "kind": "fusiontables#table",
     };
-    var post = columnTitle.map(function (t) {
-        var type;
-        var formatPattern;
+    let post: { [key: string]: any } = columnTitle.map(function (t: string) {
+        let type: string;
+        let formatPattern: string;
         switch (t) {
             case "updated":
             case "first_retrieve":
@@ -73,7 +87,7 @@ function createTable(name, columnTitle) {
                 formatPattern = "NONE";
                 break;
         }
-        var c = {
+        let c: { [key: string]: string } = {
             "name": t,
             "type": type,
             "formatPattern": formatPattern,
@@ -81,28 +95,29 @@ function createTable(name, columnTitle) {
         };
         return c;
     });
+
     resource.columns = post;
     return FusionTables.Table.insert(resource).tableId;
 }
-function getUpdatedVideos(key, videos) {
-    var sql = "SELECT id, updated FROM " + key + ";";
-    var rows = FusionTables.Query.sql(sql).rows;
-    var ids = {};
+
+function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
+    let sql = "SELECT id, updated FROM " + key + ";";
+    let rows: string[] = FusionTables.Query.sql(sql).rows;
+    let ids: { [key: string]: string } = {};
     if (rows != undefined) {
         if (rows.length >= 1) {
-            rows.forEach(function (r) {
-                ids[r[0]] = r[1];
-            });
+            for (const row of rows) {
+                ids[row[0]] = row[1];
+            }
         }
     }
-    var results = [];
-    videos.forEach(function (v) {
-        var id = v["id"];
-        var update = ids[id];
+    let results: { [key: string]: string }[] = [];
+    for (const aVideo of videos) {
+        let id = aVideo["id"];
+        let update = ids[id];
         if (update == undefined) {
-            results.push(v);
+            results.push(aVideo);
         }
-    });
+    }
     return results;
 }
-//# sourceMappingURL=fusionTables.js.map

@@ -53,7 +53,7 @@ const videoColTitle: string[] = ["updated", "title", "id", "link", "description"
     "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
     "mylist_counter", "user_nickname", "tag"];
 const tagColTitle: string[] = ["id", "tag"];
-function createTable(name: string, columnTitle: string[]): void {
+function createTable(name: string, columnTitle: string[]): string {
     let resource: { [key: string]: any } = {
         "name": name,
         "isExportable": false,
@@ -106,19 +106,18 @@ function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
     let ids: { [key: string]: string } = {};
     if (rows != undefined) {
         if (rows.length >= 1) {
-            rows.forEach((r) => {
-                ids[r[0]] = r[1];
-            });
+            for (const row of rows) {
+                ids[row[0]] = row[1];
+            }
         }
     }
-    let results: { [key: string]: string }[];
-    videos.forEach((v: { [key: string]: string }) => {
-        let id = v["id"];
+    let results: { [key: string]: string }[] = [];
+    for (const aVideo of videos) {
+        let id = aVideo["id"];
         let update = ids[id];
         if (update == undefined) {
-            results.push(v);
+            results.push(aVideo);
         }
-    });
-
+    }
     return results;
 }

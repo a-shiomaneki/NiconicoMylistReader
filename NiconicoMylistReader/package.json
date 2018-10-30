@@ -10,5 +10,8 @@
     "@types/google-apps-script": "0.0.31",
     "@types/node": "^8.0.14"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "scripts": {
+    "build": "clasp push" 
+  }
 }
