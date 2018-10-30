@@ -38,20 +38,19 @@
     <Content Include=".clasp.json" />
     <Content Include=".claspignore" />
     <Content Include="appsscript.json" />
-    <Content Include="jsconfig.json" />
     <Content Include="package.json" />
     <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="fusionTables.ts" />
-    <TypeScriptCompile Include="myUtility.ts" />
+    <TypeScriptCompile Include="myutility.ts" />
     <TypeScriptCompile Include="test\test-niconicoDouga.ts">
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="init.ts" />
+    <Compile Include="onopen.ts" />
     <Compile Include="main.ts" />
-    <Compile Include="niconicoDouga.ts" />
+    <Compile Include="niconicodouga.ts" />
     <Compile Include="sheet.ts" />
   </ItemGroup>
   <ItemGroup>
