@@ -86,6 +86,6 @@ function getListedVideoInfoToTable() {
             Logger.log(e);
             controlSheet.setError(i, e); // エラーを記録する．
         }
-    });
+    }
 }
 
