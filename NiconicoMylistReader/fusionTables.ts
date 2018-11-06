@@ -1,7 +1,8 @@
 namespace FusionTables {
     export interface Table {
-        importRows(dbid: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
+        importRows(tableId: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
         insert(resource: { [key: string]: any }): { [key: string]: any };
+        delete(dbid: string): void;
     }
     export interface Query {
         sql(sql: string): { [key: string]: any };
@@ -138,4 +139,21 @@ function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
         }
     }
     return results;
+}
+
+function deleteTable(): void {
+    let controlSheet = new ControlSheet();
+    let tableInfos = controlSheet.getTableInfos();
+    if (tableInfos.videoInfoTable.tableId) {
+        try {
+            FusionTables.Table.delete(tableInfos.videoInfoTable.tableId);
+        } catch (error) {
+            let e = error;
+            Logger.log(e);
+            throw e;
+        }
+        tableInfos.videoInfoTable.tableId = "";
+        delete tableInfos.tagInfoTable;
+        controlSheet.setTableIds(tableInfos);
+    }
 }

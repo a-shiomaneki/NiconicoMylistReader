@@ -38,8 +38,17 @@
     <Content Include=".clasp.json" />
     <Content Include=".claspignore" />
     <Content Include="appsscript.json" />
+    <Content Include="index.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Javascript.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="package.json" />
     <Content Include="tsconfig.json" />
+    <TypeScriptCompile Include="doget.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="fusiontables.ts" />
     <TypeScriptCompile Include="myutility.ts" />
     <TypeScriptCompile Include="test\test-niconicoDouga.ts">

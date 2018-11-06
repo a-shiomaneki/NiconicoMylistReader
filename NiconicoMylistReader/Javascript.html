@@ -1,0 +1,22 @@
+﻿<script>
+    //var app = angular.module('myApp', []);
+    //app.controller('mainCtrl', function ($scope) {
+    //    $scope.heading = 'Welcome';
+    //    $scope.message = 'Please enjoy this helpful script';
+    //});
+    import { QuoinexTickerActions } from '../state/quoinex-ticker/quoinex-ticker.action';
+    // add this!
+    import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+    import { MatTableModule } from '@angular/material/table';
+
+    @NgModule({
+        declarations: [AppComponent],
+        imports: [
+            BrowserModule,
+            HttpClientModule,
+            NgReduxModule,
+            // add this!
+            BrowserAnimationsModule,
+            MatTableModule
+        ],
+</script>

@@ -1,17 +1,17 @@
 class DbInfoBase {
     filename: string;
-    dbkey: string;
+    tableId: string;
     constructor() {
         this.filename = "";
-        this.dbkey = "";
+        this.tableId = "";
     }
 }
 class DbInfo {
-    videoInfoDb: DbInfoBase;
-    tagInfoDb: DbInfoBase;
+    videoInfoTable: DbInfoBase;
+    tagInfoTable: DbInfoBase;
     constructor() {
-        this.videoInfoDb = new DbInfoBase();
-        this.tagInfoDb = new DbInfoBase();
+        this.videoInfoTable = new DbInfoBase();
+        this.tagInfoTable = new DbInfoBase();
     }
 }
 class WorkStatus {
@@ -48,7 +48,7 @@ class ControlSheet {
     setError(i: number, error) {
         this.sheet.getRange(2 + i, 3).setValue(error);
     }
-    getDbInfos() {
+    getTableInfos() {
         let vs = this.sheet.getRange(2, 4, this.sheet.getLastRow() - 1, 3).getValues();
         let lastIndex = vs.length;
         for (let i = 0; i < vs.length; i++) {
@@ -62,13 +62,13 @@ class ControlSheet {
         for (let r of vs) {
             let dbType = r[0].toString();
             let filename = r[1].toString();
-            let dbkey = r[2].toString();
-            let info: DbInfoBase = { "filename": filename, "dbkey": dbkey };
+            let tableId = r[2].toString();
+            let info: DbInfoBase = { "filename": filename, "tableId": tableId };
             infos[dbType] = info;
         }
         return infos;
     }
-    setDbKeys(dbInfos: DbInfo) {
+    setTableIds(dbInfos: DbInfo) {
         let range = this.sheet.getRange(2, 4, this.sheet.getLastRow() - 1, 3);
         let values = range.getValues().map((row) => row.map((col) => col.toString()));
         let lastIndex = values.length;
@@ -79,10 +79,10 @@ class ControlSheet {
         }
         values.splice(lastIndex);
 
-        let dbkeys = values.map((row) => {
+        let tableIds = values.map((row) => {
             let type = row[0].toString();
-            return [dbInfos[type].dbkey];
+            return [dbInfos[type].tableId];
         });
-        this.sheet.getRange(2, 6, lastIndex, 1).setValues(dbkeys);
+        this.sheet.getRange(2, 6, lastIndex, 1).setValues(tableIds);
     }
 }

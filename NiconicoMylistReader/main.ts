@@ -4,14 +4,14 @@
  * トリガーをかける場合の対象メソッドの１つ
  */
 
-function getListedVideoInfoToTable() {
+function getListedVideoInfoToTable():void {
     let controlSheet = new ControlSheet();
     let mylistIds = controlSheet.getMylistIds();
-    let dbInfos = controlSheet.getDbInfos();
-    if (dbInfos.videoInfoDb.dbkey === "") {
-        dbInfos.videoInfoDb.dbkey = createTable(dbInfos.videoInfoDb.filename,
+    let dbInfos = controlSheet.getTableInfos();
+    if (dbInfos.videoInfoTable.tableId === "") {
+        dbInfos.videoInfoTable.tableId = createTable(dbInfos.videoInfoTable.filename,
             videoColTitle);
-        controlSheet.setDbKeys(dbInfos);
+        controlSheet.setTableIds(dbInfos);
     }
     for (let i = 0; i < mylistIds.length;i++) {
         let mylistId = mylistIds[i].mylistId;
@@ -25,7 +25,7 @@ function getListedVideoInfoToTable() {
                 let tagDbRows = [];
                 //let videos=[mylist.videos()[0]];
                 let videos = mylist.videos();
-                let updatedVideos = getUpdatedVideos(dbInfos.videoInfoDb.dbkey, videos);
+                let updatedVideos = getUpdatedVideos(dbInfos.videoInfoTable.tableId, videos);
                 updatedVideos.forEach((aVideo) => {
                     let row = ["updated", "title", "id", "link"].map((name) => {
                         return aVideo[name];
@@ -76,8 +76,8 @@ function getListedVideoInfoToTable() {
                     //let rowsStr = JSON.stringify(rows);
                     //setVideoInfos(mylistId,rows);
                     //ControlSheet.setResult(i,mylist.updated());
-                    storeData(rowsStr, dbInfos.videoInfoDb.dbkey);
-                    //storeData(tagDbRowsStr,dbInfos.tagDb.dbkey);
+                    storeData(rowsStr, dbInfos.videoInfoTable.tableId);
+                    //storeData(tagDbRowsStr,dbInfos.tagDb.tableId);
                 }
                 controlSheet.setResult(i, mylist.updated());
             }
