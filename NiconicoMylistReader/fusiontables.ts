@@ -145,15 +145,15 @@ function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
 function deleteTable(): void {
     let controlSheet = new ControlSheet();
     let tableInfos = controlSheet.getTableInfos();
-    if (tableInfos.videoInfoTable.tableId) {
+    if (tableInfos.videoInfoTable.id) {
         try {
-            FusionTables.Table.remove(tableInfos.videoInfoTable.tableId);
+            FusionTables.Table.remove(tableInfos.videoInfoTable.id);
         } catch (error) {
             let e = error;
             Logger.log(e);
             throw e;
         }
-        tableInfos.videoInfoTable.tableId = "";
+        tableInfos.videoInfoTable.id = "";
         delete tableInfos.tagInfoTable;
         controlSheet.setTableIds(tableInfos);
     }

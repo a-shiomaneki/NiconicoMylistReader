@@ -6,26 +6,26 @@
 
 function getListedVideoInfoToTable(): void {
     let controlSheet = new ControlSheet();
-    let mylistIds = controlSheet.getMylistIds();
-    let dbInfos = controlSheet.getTableInfos();
-    if (dbInfos.videoInfoTable.tableId === "") {
-        dbInfos.videoInfoTable.tableId = createTable(dbInfos.videoInfoTable.filename,
+    let mylistInfos = controlSheet.getMylistInfos();
+    let tableInfos = controlSheet.getTableInfos();
+    if (tableInfos.videoInfoTable.id === "") {
+        tableInfos.videoInfoTable.id = createTable(tableInfos.videoInfoTable.filename,
             videoColTitle);
-        controlSheet.setTableIds(dbInfos);
+        controlSheet.setTableIds(tableInfos);
     }
-    for (let i = 0; i < mylistIds.length; i++) {
-        let mylistId = mylistIds[i].mylistId;
-        let lastUpdate = mylistIds[i].lastUpdate;
+    for (let i = 0; i < mylistInfos.length; i++) {
+        let mylistInfo = mylistInfos[i].idOrUrl;
+        let lastUpdate = mylistInfos[i].last_entry;
         let w3ctime = new W3CTime();
         try {
-            let mylist = new Mylist(mylistId);
-            let videos = mylist.videos();
+            let mylist = new NndMylist(mylistInfo);
+            let videos = mylist.getVideos();
             let lastEntryDate = videos[0]["published"];
             if (lastUpdate === "" || w3ctime.isT2Latest(lastUpdate,
                 lastEntryDate)) {
                 let rows = [];
                 let tagDbRows = [];
-                let updatedVideos = getUpdatedVideos(dbInfos.videoInfoTable.tableId, videos);
+                let updatedVideos = getUpdatedVideos(tableInfos.videoInfoTable.id, videos);
                 updatedVideos.forEach((aVideo) => {
                     let row = ["title", "id", "link"].map((name) => {
                         return aVideo[name];
@@ -65,11 +65,10 @@ function getListedVideoInfoToTable(): void {
                 if (rows.length > 0) {
                     let rowsStr = arrayToStr(rows);
                     let tagDbRowsStr = arrayToStr(tagDbRows);
-                    storeData(rowsStr, dbInfos.videoInfoTable.tableId);
+                    storeData(rowsStr, tableInfos.videoInfoTable.id);
                 }
-                controlSheet.setResult(i, lastEntryDate);
-                controlSheet.setError(i, "");
-            }
+                controlSheet.setResult(i,mylist.getTitle(),mylist.getAuthor(),mylist.getUpdated(), lastEntryDate,w3ctime.now(),"");
+             }
         } catch (error) {
             let e = error;
             Logger.log(e);

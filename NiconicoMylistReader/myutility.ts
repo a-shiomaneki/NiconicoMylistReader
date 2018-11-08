@@ -7,7 +7,11 @@ class W3CTime {
         let ts: number[] = [t1, t2].map(this.parse);
         return (ts[0] < ts[1]);
     }
+    now() {
+        return Utilities.formatDate(new Date(), "JST", "yyyy-MM-dd'T'HH:mm:ss'+09:00'");;
+    }
 }
+
 
 function arrayToStr(ar: any[]): string {
     let str: string = ar.map(function (r: any, i: number): string[] {

@@ -1,13 +1,14 @@
-class Mylist {
+class NndMylist {
     id: string;
     link: string;
     rss_url: string;
     atom: GoogleAppsScript.XML_Service.Namespace;
     root: GoogleAppsScript.XML_Service.Element;
 
-    constructor(id: string) {
-        this.id = id;
-        this.link = "https://www.nicovideo.jp/mylist/" + id;
+    constructor(info: string) {
+        let found = info.match(/(https*:\/\/.+\/)*(\d+)/);
+        this.id = found[2];
+        this.link = "https://www.nicovideo.jp/mylist/" + this.id;
         this.rss_url = this.link + "?rss=atom";
         this.atom = this.getAtom();
         this.root = this.getMylist();
@@ -36,13 +37,17 @@ class Mylist {
         }
         return root;
     }
-    updated() {
+    getUpdated() {
         return this.root.getChildText("updated", this.atom);
     }
-    title() {
+    getTitle() {
         return this.root.getChildText("title", this.atom);
     }
-    videos() {
+    getAuthor() {
+        let author = this.root.getChild("author", this.atom);
+        return author.getChildText("name", this.atom);
+    }
+    getVideos() {
         let entries = this.root.getChildren("entry", this.atom);
         let infos: { [key: string]: string }[] = [];
         entries.forEach(function (aEntry) {

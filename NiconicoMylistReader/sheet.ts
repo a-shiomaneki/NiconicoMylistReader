@@ -1,88 +1,118 @@
-class DbInfoBase {
-    filename: string;
-    tableId: string;
+class TableInfoBase {
+    filename: string = "";
+    id: string = "";
+}
+class TableInfo {
+    videoInfoTable: TableInfoBase;
+    tagInfoTable: TableInfoBase;
+    static columnOffset: { [key: string]: number } = { "type": 0, "filename": 1, "id": 2 };
     constructor() {
-        this.filename = "";
-        this.tableId = "";
+        this.videoInfoTable = new TableInfoBase();
+        this.tagInfoTable = new TableInfoBase();
+    }
+    static getColumnSize() {
+        return Object.keys(this.columnOffset).length;
     }
 }
-class DbInfo {
-    videoInfoTable: DbInfoBase;
-    tagInfoTable: DbInfoBase;
-    constructor() {
-        this.videoInfoTable = new DbInfoBase();
-        this.tagInfoTable = new DbInfoBase();
-    }
-}
-class WorkStatus {
-    mylistId: string;
-    lastUpdate: string;
-    result: string;
-    constructor(mylistId, lastUpdate, result) {
-        this.mylistId = mylistId;
-        this.lastUpdate = lastUpdate;
-        this.result = result;
+class MylistInfo {
+    idOrUrl: string = "";
+    title: string = "";
+    author: string = "";
+    update: string = "";
+    last_entry: string = "";
+    processed: string = "";
+    result: string = "";
+    static columnOffset: { [key: string]: number } = {
+        "idOrUrl": 0, "title": 1, "author": 2,
+        "update": 3, "last_entry": 4, "processed": 5, "result": 6
+    };
+    static getColumnSize() {
+        return Object.keys(this.columnOffset).length;
     }
 }
 
 class ControlSheet {
     sheet: GoogleAppsScript.Spreadsheet.Sheet;
+    mylistInfoOffset: number;
+    tableInfoOffset: number;
     constructor() {
         this.sheet = SpreadsheetApp.getActive().getSheetByName("コントロールシート");
+        this.mylistInfoOffset = 0;
+        let offsets: number[] = [];
+        for (let key in MylistInfo.columnOffset) {
+            offsets.push(MylistInfo.columnOffset[key]);
+        }
+        let maxCol = Math.max.apply(null, offsets);
+        this.tableInfoOffset = maxCol + 1;
     }
-    getMylistIds(): WorkStatus[] {
-        let range = this.sheet.getRange(2, 1, this.sheet.getLastRow() - 1, 3);
+    getMylistInfos(): MylistInfo[] {
+        let mylistInfos: MylistInfo[] = [];
+        let range = this.sheet.getRange(2, this.mylistInfoOffset + 1, this.sheet.getLastRow() - 1, MylistInfo.getColumnSize());
         let lastResults = range.getValues().map((row) => row.map((col) => col.toString()));
-        let workStatusies: WorkStatus[] = [];
+        const o = MylistInfo.columnOffset;
         for (let result of lastResults) {
-            if (result[0] == "") {
+            if (result[o["idOrUrl"]] == "") {
                 break;
             }
-            workStatusies.push(new WorkStatus(result[0], result[1], result[2]));
+            let mylistInfo = new MylistInfo();
+            for (let key in MylistInfo.columnOffset) {
+                mylistInfo[key] = result[o[key]];
+            }
+            mylistInfos.push(mylistInfo);
         }
-        return workStatusies;
+        return mylistInfos;
     }
-    setResult(i: number, updated) {
-        this.sheet.getRange(2 + i, 2, 1, 2).setValues([[updated, ""]]);
+    setResult(i: number, title:string, author: string, updated: string, last_entry: string, processed: string, result: string) {
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1, MylistInfo.getColumnSize() - 1).
+            setValues([[title, author, updated, last_entry, processed, ""]]);
     }
     setError(i: number, error) {
-        this.sheet.getRange(2 + i, 3).setValue(error);
+        this.sheet.getRange(2 + i, this.mylistInfoOffset +MylistInfo.columnOffset["result"] + 1).setValue(error);
     }
     getTableInfos() {
-        let vs = this.sheet.getRange(2, 4, this.sheet.getLastRow() - 1, 3).getValues();
-        let lastIndex = vs.length;
-        for (let i = 0; i < vs.length; i++) {
-            if (vs[i][0].toString() == "") {
+        let range = this.sheet.getRange(2, this.tableInfoOffset + 1, this.sheet.getLastRow() - 1, TableInfo.getColumnSize());
+        let values = range.getValues().map((row) => row.map((col) => col.toString()));
+        const o = TableInfo.columnOffset;
+        let lastIndex = values.length;
+        for (let i = 0; i < values.length; i++) {
+            if (values[i][o["type"]] == "") {
                 lastIndex = i;
             }
         }
-        vs.splice(lastIndex);
+        values.splice(lastIndex);
 
-        let infos = new DbInfo();
-        for (let r of vs) {
-            let dbType = r[0].toString();
-            let filename = r[1].toString();
-            let tableId = r[2].toString();
-            let info: DbInfoBase = { "filename": filename, "tableId": tableId };
-            infos[dbType] = info;
+        let infos = new TableInfo();
+        for (let r of values) {
+            let info = new TableInfoBase();
+            let type = "";
+            for (let key in o) {
+                if (key == "type") {
+                    type = r[o[key]];
+                } else {
+                    info[key] = r[o[key]];
+                }
+            }
+            infos[type] = info;
         }
         return infos;
     }
-    setTableIds(dbInfos: DbInfo) {
-        let range = this.sheet.getRange(2, 4, this.sheet.getLastRow() - 1, 3);
+    setTableIds(tableInfos: TableInfo) {
+        let range = this.sheet.getRange(2, this.tableInfoOffset + 1, this.sheet.getLastRow() - 1, TableInfo.getColumnSize());
         let values = range.getValues().map((row) => row.map((col) => col.toString()));
+        const o = TableInfo.columnOffset;
         let lastIndex = values.length;
         for (let i = 0; i < values.length; i++) {
-            if (values[i][0] == "") {
+            if (values[i][o["type"]] == "") {
+                lastIndex = i;
                 break;
             }
         }
         values.splice(lastIndex);
 
         let tableIds = values.map((row) => {
-            let type = row[0].toString();
-            return [dbInfos[type].tableId];
+            let type = row[o["id"]];
+            return [tableInfos[type].tableId];
         });
-        this.sheet.getRange(2, 6, lastIndex, 1).setValues(tableIds);
+        this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setValues(tableIds);
     }
 }
