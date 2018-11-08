@@ -4,7 +4,7 @@
  * トリガーをかける場合の対象メソッドの１つ
  */
 
-function getListedVideoInfoToTable():void {
+function getListedVideoInfoToTable(): void {
     let controlSheet = new ControlSheet();
     let mylistIds = controlSheet.getMylistIds();
     let dbInfos = controlSheet.getTableInfos();
@@ -13,7 +13,7 @@ function getListedVideoInfoToTable():void {
             videoColTitle);
         controlSheet.setTableIds(dbInfos);
     }
-    for (let i = 0; i < mylistIds.length;i++) {
+    for (let i = 0; i < mylistIds.length; i++) {
         let mylistId = mylistIds[i].mylistId;
         let lastUpdate = mylistIds[i].lastUpdate;
         let w3ctime = new W3CTime();
@@ -27,7 +27,7 @@ function getListedVideoInfoToTable():void {
                 let tagDbRows = [];
                 let updatedVideos = getUpdatedVideos(dbInfos.videoInfoTable.tableId, videos);
                 updatedVideos.forEach((aVideo) => {
-                    let row = ["updated", "title", "id", "link"].map((name) => {
+                    let row = ["title", "id", "link"].map((name) => {
                         return aVideo[name];
                     });
                     let videoDetail = new VideoDetail(aVideo.id);
@@ -42,25 +42,17 @@ function getListedVideoInfoToTable():void {
                             }
                         }
                         // データの並びを整えて１行分のデータとして準備する．
-                        row = row.concat(["description", "thumbnail_url",
+
+                        row = ["title", "video_id", "watch_url",
+                            "description", "thumbnail_url",
                             "first_retrieve", "length", "view_counter",
                             "comment_num", "mylist_counter",
                             "user_nickname"].map((name) => {
-                            return vd[name];
-                        }));
+                                return vd[name];
+                            });
                         let tags = videoDetail.getTags();
-                        rows.push(row.concat(JSON.stringify(tags)));
-                        //if (tags.length > 1) {
-                        //    //rows.push(row.concat(JSON.stringify(tags)));
-                        //    //rows.push(row.concat(tags.join(",")));
-                        //    //rows.push(row);
-                        //    let id = videoDetail.id;
-                        //    tags.forEach((t) => {
-                        //        //tagDbRows.push([id,t]);
-                        //        rows.push(row.concat(t));
-                        //    });
-                        //}
-
+                        row = row.concat([JSON.stringify(tags), mylist.getLink(),aVideo["updated"]]);
+                        rows.push(row);
                     } else { // 動画がコミュニティ限定など公開されていない場合
                         let compNum = videoColTitle.length - row.length;
                         for (let i = 0; i < compNum; i++) {
@@ -73,13 +65,10 @@ function getListedVideoInfoToTable():void {
                 if (rows.length > 0) {
                     let rowsStr = arrayToStr(rows);
                     let tagDbRowsStr = arrayToStr(tagDbRows);
-                    //let rowsStr = JSON.stringify(rows);
-                    //setVideoInfos(mylistId,rows);
-                    //ControlSheet.setResult(i,mylist.updated());
                     storeData(rowsStr, dbInfos.videoInfoTable.tableId);
-                    //storeData(tagDbRowsStr,dbInfos.tagDb.tableId);
                 }
                 controlSheet.setResult(i, lastEntryDate);
+                controlSheet.setError(i, "");
             }
         } catch (error) {
             let e = error;

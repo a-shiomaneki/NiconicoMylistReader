@@ -50,9 +50,9 @@ function storeData(str: string, dbid: string): void {
     } while (isDone === false);
 }
 
-const videoColTitle: string[] = ["updated", "title", "id", "link", "description",
+const videoColTitle: string[] = ["title", "id", "link", "description",
     "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
-    "mylist_counter", "user_nickname", "tag"];
+    "mylist_counter", "user_nickname", "tag", "list_url", "entry_date"];
 const tagColTitle: string[] = ["id", "tag"];
 function createTable(name: string, columnTitle: string[]): string {
     let resource: { [key: string]: any } = {
@@ -60,18 +60,19 @@ function createTable(name: string, columnTitle: string[]): string {
         "isExportable": false,
         "kind": "fusiontables#table",
     };
-    let post: { [key: string]: any } = columnTitle.map(function (name: string) {
+    let post: { [key: string]: any } = columnTitle.map((name: string) => {
         let type: string;
         let formatPattern: string;
         let columnJsonSchema: string;
         switch (name) {
-            case "updated":
             case "first_retrieve":
             case "length":
+            case "entry_date":
                 type = "DATETIME";
                 formatPattern = "NONE";
                 break;
             case "link":
+            case "list_url":
                 type = "STRING";
                 formatPattern = "STRING_LINK";
                 break;
@@ -120,7 +121,7 @@ function createTable(name: string, columnTitle: string[]): string {
 }
 
 function getUpdatedVideos(key: string, videos): { [key: string]: string }[] {
-    let sql = "SELECT id, updated FROM " + key + ";";
+    let sql = "SELECT id FROM " + key + ";";
     let rows: string[] = FusionTables.Query.sql(sql).rows;
     let ids: { [key: string]: string } = {};
     if (rows != undefined) {

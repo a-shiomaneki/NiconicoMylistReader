@@ -1,12 +1,14 @@
 class Mylist {
     id: string;
-    url: string;
+    link: string;
+    rss_url: string;
     atom: GoogleAppsScript.XML_Service.Namespace;
     root: GoogleAppsScript.XML_Service.Element;
 
     constructor(id: string) {
         this.id = id;
-        this.url = "https://www.nicovideo.jp/mylist/" + id + "?rss=atom";
+        this.link = "https://www.nicovideo.jp/mylist/" + id;
+        this.rss_url = this.link + "?rss=atom";
         this.atom = this.getAtom();
         this.root = this.getMylist();
     }
@@ -24,7 +26,7 @@ class Mylist {
     getMylist() {
         let root: GoogleAppsScript.XML_Service.Element;
         try {
-            let response = UrlFetchApp.fetch(this.url);
+            let response = UrlFetchApp.fetch(this.rss_url);
             let xml = XmlService.parse(response.getContentText());
             root = xml.getRootElement();
         } catch (error) {
@@ -58,6 +60,9 @@ class Mylist {
             infos.push(info);
         });
         return infos;
+    }
+    getLink() {
+        return this.link;
     }
 }
 
