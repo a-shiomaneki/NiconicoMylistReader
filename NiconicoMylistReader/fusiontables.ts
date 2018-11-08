@@ -2,7 +2,7 @@ namespace FusionTables {
     export interface Table {
         importRows(tableId: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
         insert(resource: { [key: string]: any }): { [key: string]: any };
-        delete(dbid: string): void;
+        remove(dbid: string): void;
     }
     export interface Query {
         sql(sql: string): { [key: string]: any };
@@ -146,7 +146,7 @@ function deleteTable(): void {
     let tableInfos = controlSheet.getTableInfos();
     if (tableInfos.videoInfoTable.tableId) {
         try {
-            FusionTables.Table.delete(tableInfos.videoInfoTable.tableId);
+            FusionTables.Table.remove(tableInfos.videoInfoTable.tableId);
         } catch (error) {
             let e = error;
             Logger.log(e);

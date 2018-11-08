@@ -19,12 +19,12 @@ function getListedVideoInfoToTable():void {
         let w3ctime = new W3CTime();
         try {
             let mylist = new Mylist(mylistId);
+            let videos = mylist.videos();
+            let lastEntryDate = videos[0]["published"];
             if (lastUpdate === "" || w3ctime.isT2Latest(lastUpdate,
-                                                        mylist.updated())) {
+                lastEntryDate)) {
                 let rows = [];
                 let tagDbRows = [];
-                //let videos=[mylist.videos()[0]];
-                let videos = mylist.videos();
                 let updatedVideos = getUpdatedVideos(dbInfos.videoInfoTable.tableId, videos);
                 updatedVideos.forEach((aVideo) => {
                     let row = ["updated", "title", "id", "link"].map((name) => {
@@ -79,7 +79,7 @@ function getListedVideoInfoToTable():void {
                     storeData(rowsStr, dbInfos.videoInfoTable.tableId);
                     //storeData(tagDbRowsStr,dbInfos.tagDb.tableId);
                 }
-                controlSheet.setResult(i, mylist.updated());
+                controlSheet.setResult(i, lastEntryDate);
             }
         } catch (error) {
             let e = error;
