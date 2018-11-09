@@ -63,11 +63,11 @@ class ControlSheet {
         return mylistInfos;
     }
     setlastEntryDate(i: number, last_entry: string) {
-        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["last_entry"] + 1, 1,1).
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["last_entry"] + 1, 1, 1).
             setValues([[last_entry]]);
     }
     setMylistInfo(i: number, title: string, author: string, updated: string) {
-        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1,3).
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1, 3).
             setValues([[title, author, updated]]);
     }
     setResult(i: number, processed: string, result: string) {
@@ -115,10 +115,16 @@ class ControlSheet {
         }
         values.splice(lastIndex);
 
-        let tableIds = values.map((row) => {
+        let tableIds = values.map((row): string[] => {
             let type = row[o["type"]];
             return [tableInfos[type].id];
         });
         this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setValues(tableIds);
+
+        let links = values.map((row): string[] => {
+            return ["=HYPERLINK(\"https://https://fusiontables.google.com/DataSource?docid=" +
+                    row["id"] + "\",\"" + row["filename"] + "\")"];
+        });
+        this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setFormulas(links);
     }
 }
