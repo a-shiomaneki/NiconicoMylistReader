@@ -18,3 +18,15 @@ function onOpen(): void {
     ];
     spreadsheet.addMenu("マイリスリーダー", entries);
 }
+
+function deleteTable() {
+    let controlSheet = new ControlSheet();
+    let tableInfos = controlSheet.getTableInfos();
+    if (tableInfos.videoInfoTable.id != "") {
+        let videoInfoTable = new MylistTable();
+        videoInfoTable.tableId = tableInfos.videoInfoTable.id;
+        videoInfoTable.deleteTable();
+        tableInfos.videoInfoTable.id = "";
+        controlSheet.setTableIds(tableInfos);
+    } 
+}
