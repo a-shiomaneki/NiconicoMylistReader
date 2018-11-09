@@ -14,7 +14,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0f16a0ad-831a-4ae3-80e5-6cfeacc9be9b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>main.ts</StartupFile>
+    <StartupFile>code.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="onopen.ts" />
-    <TypeScriptCompile Include="main.ts" />
+    <TypeScriptCompile Include="code.ts" />
     <TypeScriptCompile Include="niconicodouga.ts" />
     <Compile Include="sheet.ts" />
   </ItemGroup>

@@ -3,6 +3,9 @@
  * FusionTablesに動画情報を保存する場合に使う
  * トリガーをかける場合の対象メソッドの１つ
  */
+function main(): void {
+    getListedVideoInfoToTable();
+}
 
 function getListedVideoInfoToTable(): void {
     let controlSheet = new ControlSheet();
@@ -47,7 +50,6 @@ function getListedVideoInfoToTable(): void {
                             }
                         }
                         // データの並びを整えて１行分のデータとして準備する．
-
                         row = ["title", "video_id", "watch_url",
                             "description", "thumbnail_url",
                             "first_retrieve", "length", "view_counter",

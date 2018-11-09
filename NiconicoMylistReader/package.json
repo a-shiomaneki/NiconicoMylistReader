@@ -2,7 +2,7 @@
   "name": "niconico-mylist-reader",
   "version": "0.0.1",
   "description": "NiconicoMylistReader",
-  "main": "main.js",
+  "main": "code.js",
   "author": {
     "name": "A.Shiomaneki"
   },
