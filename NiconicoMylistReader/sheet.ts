@@ -45,7 +45,7 @@ class ControlSheet {
         let maxCol = Math.max.apply(null, offsets);
         this.tableInfoOffset = maxCol + 1;
     }
-    getMylistInfos(): MylistInfo[] {
+    getMylistInfoWithResults(): MylistInfo[] {
         let mylistInfos: MylistInfo[] = [];
         let range = this.sheet.getRange(2, this.mylistInfoOffset + 1, this.sheet.getLastRow() - 1, MylistInfo.getColumnSize());
         let lastResults = range.getValues().map((row) => row.map((col) => col.toString()));
@@ -62,12 +62,18 @@ class ControlSheet {
         }
         return mylistInfos;
     }
-    setResult(i: number, title:string, author: string, updated: string, last_entry: string, processed: string, result: string) {
-        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1, MylistInfo.getColumnSize() - 1).
-            setValues([[title, author, updated, last_entry, processed, ""]]);
+    setlastEntryDate(i: number, last_entry: string) {
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["last_entry"] + 1, 1,1).
+            setValues([[last_entry]]);
     }
-    setError(i: number, error) {
-        this.sheet.getRange(2 + i, this.mylistInfoOffset +MylistInfo.columnOffset["result"] + 1).setValue(error);
+    setMylistInfo(i: number, title: string, author: string, updated: string) {
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1,3).
+            setValues([[title, author, updated]]);
+    }
+    setResult(i: number, processed: string, result: string) {
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["processed"] + 1, 1, 2).
+            setValues([[processed, result]]);
+        SpreadsheetApp.flush();
     }
     getTableInfos() {
         let range = this.sheet.getRange(2, this.tableInfoOffset + 1, this.sheet.getLastRow() - 1, TableInfo.getColumnSize());
@@ -110,8 +116,8 @@ class ControlSheet {
         values.splice(lastIndex);
 
         let tableIds = values.map((row) => {
-            let type = row[o["id"]];
-            return [tableInfos[type].tableId];
+            let type = row[o["type"]];
+            return [tableInfos[type].id];
         });
         this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setValues(tableIds);
     }

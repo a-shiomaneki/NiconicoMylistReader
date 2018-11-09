@@ -6,12 +6,14 @@
 
 function getListedVideoInfoToTable(): void {
     let controlSheet = new ControlSheet();
-    let mylistInfos = controlSheet.getMylistInfos();
+    let mylistInfos = controlSheet.getMylistInfoWithResults();
     let tableInfos = controlSheet.getTableInfos();
+    let mylistTable = new MylistTable();
     if (tableInfos.videoInfoTable.id === "") {
-        tableInfos.videoInfoTable.id = createTable(tableInfos.videoInfoTable.filename,
-            videoColTitle);
+        tableInfos.videoInfoTable.id = mylistTable.createTable(tableInfos.videoInfoTable.filename);
         controlSheet.setTableIds(tableInfos);
+    } else {
+        mylistTable.tableId = tableInfos.videoInfoTable.id;
     }
     for (let i = 0; i < mylistInfos.length; i++) {
         let mylistInfo = mylistInfos[i].idOrUrl;
@@ -21,11 +23,15 @@ function getListedVideoInfoToTable(): void {
             let mylist = new NndMylist(mylistInfo);
             let videos = mylist.getVideos();
             let lastEntryDate = videos[0]["published"];
-            if (lastUpdate === "" || w3ctime.isT2Latest(lastUpdate,
-                lastEntryDate)) {
+            controlSheet.setMylistInfo(i, mylist.getTitle(), mylist.getAuthor(), mylist.getUpdated());
+            controlSheet.setlastEntryDate(i, lastEntryDate);
+            if (lastUpdate === "" ||
+                w3ctime.isT2Latest(lastUpdate, lastEntryDate) ||
+                !/(done|latast)/.test(mylistInfos[i].result)) {
+                controlSheet.setResult(i, w3ctime.now(), "start");
                 let rows = [];
                 let tagDbRows = [];
-                let updatedVideos = getUpdatedVideos(tableInfos.videoInfoTable.id, videos);
+                let updatedVideos = mylistTable.getUpdatedVideos(videos);
                 updatedVideos.forEach((aVideo) => {
                     let row = ["title", "id", "link"].map((name) => {
                         return aVideo[name];
@@ -33,7 +39,6 @@ function getListedVideoInfoToTable(): void {
                     let videoDetail = new VideoDetail(aVideo.id);
                     let vd = videoDetail.getDetail();
                     if (vd.status == "ok") {
-                        //vd.thumbnail_url="=image(\""+vd.thumbnail_url+"\")";
                         if (vd.user_nickname == undefined) {
                             if (vd.ch_name != undefined) {
                                 vd.user_nickname = vd.ch_name;
@@ -51,28 +56,29 @@ function getListedVideoInfoToTable(): void {
                                 return vd[name];
                             });
                         let tags = videoDetail.getTags();
-                        row = row.concat([JSON.stringify(tags), mylist.getLink(),aVideo["updated"]]);
+                        row = row.concat([JSON.stringify(tags), mylist.getLink(), aVideo["updated"]]);
                         rows.push(row);
                     } else { // 動画がコミュニティ限定など公開されていない場合
-                        let compNum = videoColTitle.length - row.length;
+                        let compNum = MylistTable.videoColTitle.length - row.length;
                         for (let i = 0; i < compNum; i++) {
                             row.push("");
                         }
                         rows.push(row);
                     }
                 });
-
                 if (rows.length > 0) {
                     let rowsStr = arrayToStr(rows);
                     let tagDbRowsStr = arrayToStr(tagDbRows);
-                    storeData(rowsStr, tableInfos.videoInfoTable.id);
+                    mylistTable.storeData(rowsStr);
                 }
-                controlSheet.setResult(i,mylist.getTitle(),mylist.getAuthor(),mylist.getUpdated(), lastEntryDate,w3ctime.now(),"");
-             }
+                controlSheet.setResult(i, w3ctime.now(), "done");
+            } else {
+                controlSheet.setResult(i, w3ctime.now(), "latest");
+            }
         } catch (error) {
             let e = error;
             Logger.log(e);
-            controlSheet.setError(i, e); // エラーを記録する．
+            controlSheet.setResult(i, w3ctime.now(), e); // エラーを記録する．
         }
     }
 }
