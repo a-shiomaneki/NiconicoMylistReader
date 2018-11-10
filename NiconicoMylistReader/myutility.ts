@@ -1,4 +1,4 @@
-class W3CTime {
+export class W3CTime {
     parse(t: string): number {
         let r: string = t.replace(/T/, " ").replace(/-/g, "/").replace(/\+(.*):(.*)/, " GMT+$1$2");
         return Date.parse(r);
@@ -13,7 +13,7 @@ class W3CTime {
 }
 
 
-function arrayToStr(ar: any[]): string {
+export function arrayToStr(ar: any[]): string {
     let str: string = ar.map(function (r: any, i: number): string[] {
         try {
             return r.map(function (c: any): string {

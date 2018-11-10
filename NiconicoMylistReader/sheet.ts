@@ -1,8 +1,9 @@
-class TableInfoBase {
+export class TableInfoBase {
     filename: string = "";
     id: string = "";
 }
-class TableInfo {
+
+export class TableInfo {
     videoInfoTable: TableInfoBase;
     tagInfoTable: TableInfoBase;
     static columnOffset: { [key: string]: number } = { "type": 0, "filename": 1, "id": 2 };
@@ -14,7 +15,8 @@ class TableInfo {
         return Object.keys(this.columnOffset).length;
     }
 }
-class MylistInfo {
+
+export class MylistInfo {
     idOrUrl: string = "";
     title: string = "";
     author: string = "";
@@ -31,7 +33,7 @@ class MylistInfo {
     }
 }
 
-class ControlSheet {
+export class ControlSheet {
     sheet: GoogleAppsScript.Spreadsheet.Sheet;
     mylistInfoOffset: number;
     tableInfoOffset: number;
@@ -120,11 +122,23 @@ class ControlSheet {
             return [tableInfos[type].id];
         });
         this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setValues(tableIds);
-
+    }
+    setLinkTableIdsFilename() {
+        let range = this.sheet.getRange(2, this.tableInfoOffset + 1, this.sheet.getLastRow() - 1, TableInfo.getColumnSize());
+        let values = range.getValues().map((row) => row.map((col) => col.toString()));
+        const o = TableInfo.columnOffset;
+        let lastIndex = values.length;
+        for (let i = 0; i < values.length; i++) {
+            if (values[i][o["type"]] == "") {
+                lastIndex = i;
+                break;
+            }
+        }
+        values.splice(lastIndex);
         let links = values.map((row): string[] => {
-            return ["=HYPERLINK(\"https://https://fusiontables.google.com/DataSource?docid=" +
-                    row["id"] + "\",\"" + row["filename"] + "\")"];
+            return ["=HYPERLINK(\"https://fusiontables.google.com/DataSource?docid=" +
+                row[o["id"]] + "\",\"" + row[o["filename"]] + "\")"];
         });
-        this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["id"] + 1, lastIndex, 1).setFormulas(links);
+        this.sheet.getRange(2, this.tableInfoOffset + TableInfo.columnOffset["filename"] + 1, lastIndex, 1).setFormulas(links);
     }
 }

@@ -1,3 +1,5 @@
+import { MylistTable } from "./fusiontables";
+
 /**
  * SpreadSheetを開いたときにonOpen()メソッドが呼ばれる．
  */
@@ -36,7 +38,7 @@ function deleteTable() {
 }
 
 function setupControlSheet() {
-    const mylistInfoColumnTitles = ["マイリスト", "タイトル", "ユーザー名", "マイリスト作成日", "最新登録日", "処理日", "処理状況"];
+    const mylistInfoColumnTitles = ["マイリスト", "タイトル", "ユーザー名", "マイリストアップデート", "動画最新登録", "処理", "処理状況"];
     const tableColumnTitles = ["データベース種別", "ファイル名", "データベースID", "処理状況"];
     const rowNum = 21;
 

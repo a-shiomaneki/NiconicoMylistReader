@@ -1,4 +1,13 @@
-class NndMylist {
+export class NndMylistVideoEntry {
+    title: string = "";
+    link: string = "";
+    id: string = "";
+    published: string = "";
+    updated: string = "";
+    content: string = "";
+}
+
+export class NndMylist {
     id: string;
     link: string;
     rss_url: string;
@@ -48,20 +57,30 @@ class NndMylist {
         return author.getChildText("name", this.atom);
     }
     getVideos() {
-        let entries = this.root.getChildren("entry", this.atom);
-        let infos: { [key: string]: string }[] = [];
-        entries.forEach(function (aEntry) {
-            let info = {};
+        let entriesFromHtml = this.root.getChildren("entry", this.atom);
+        let entries: NndMylistVideoEntry;
+        let infos: NndMylistVideoEntry[] = [];
+        let illegalCharacters = '<em>The Amazing Adventures of Kavalier & Clay</em>';
+        entriesFromHtml.forEach(function (aEntry) {
+            let info = new NndMylistVideoEntry();
             for (const elem of aEntry.getChildren()) {
                 let name = elem.getName();
-                if (name == "link") {
-                    info["link"] = elem.getAttribute("href").getValue();
-                } else {
-                    info[name] = elem.getText();
+                switch (name) {
+                    case "link":
+                        info.link = elem.getAttribute("href").getValue();
+                        let posOfDelimiter = info.link.lastIndexOf("/");
+                        info.id = info.link.slice(posOfDelimiter + 1);
+                        break;
+                    case "id":
+                        break;
+                    case "content":
+                        info.content = elem.getText();
+                        break;
+                    default:
+                        info[name] = elem.getText();
+                        break;
                 }
             }
-            let posOfDelimiter = info["link"].lastIndexOf("/");
-            info["id"] = info["link"].slice(posOfDelimiter + 1);
             infos.push(info);
         });
         return infos;
@@ -71,7 +90,7 @@ class NndMylist {
     }
 }
 
-class VideoDetail {
+export class VideoDetail {
     id: string;
     url: string;
     root: GoogleAppsScript.XML_Service.Element;

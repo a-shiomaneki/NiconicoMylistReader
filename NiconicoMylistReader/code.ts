@@ -1,3 +1,9 @@
+import { MylistTable, MylistTableRecord } from "./fusiontables";
+import { NndMylist, VideoDetail } from "./niconicodouga";
+import { W3CTime, arrayToStr } from "./myutility";
+import { ControlSheet } from "./sheet";
+import { link } from "fs";
+
 /**
  * エントリーポイント
  * FusionTablesに動画情報を保存する場合に使う
@@ -7,7 +13,11 @@ function main(): void {
     getListedVideoInfoToTable();
 }
 
+
 function getListedVideoInfoToTable(): void {
+    let isInTime = true;
+    let w3ctime = new W3CTime();
+    let startTime = Date.now();
     let controlSheet = new ControlSheet();
     let mylistInfos = controlSheet.getMylistInfoWithResults();
     let tableInfos = controlSheet.getTableInfos();
@@ -18,27 +28,35 @@ function getListedVideoInfoToTable(): void {
     } else {
         mylistTable.tableId = tableInfos.videoInfoTable.id;
     }
-    for (let i = 0; i < mylistInfos.length; i++) {
+    controlSheet.setLinkTableIdsFilename();
+    for (let i = 0; i < mylistInfos.length && isInTime; i++) {
         let mylistInfo = mylistInfos[i].idOrUrl;
         let lastUpdate = mylistInfos[i].last_entry;
-        let w3ctime = new W3CTime();
         try {
             let mylist = new NndMylist(mylistInfo);
             let videos = mylist.getVideos();
             let lastEntryDate = videos[0]["published"];
             controlSheet.setMylistInfo(i, mylist.getTitle(), mylist.getAuthor(), mylist.getUpdated());
             controlSheet.setlastEntryDate(i, lastEntryDate);
+            let counter = 0;
             if (lastUpdate === "" ||
                 w3ctime.isT2Latest(lastUpdate, lastEntryDate) ||
-                !/(done|latast)/.test(mylistInfos[i].result)) {
+                !/(done|latest)/.test(mylistInfos[i].result)) {
                 controlSheet.setResult(i, w3ctime.now(), "start");
                 let rows = [];
                 let tagDbRows = [];
-                let updatedVideos = mylistTable.getUpdatedVideos(videos);
-                updatedVideos.forEach((aVideo) => {
-                    let row = ["title", "id", "link"].map((name) => {
-                        return aVideo[name];
-                    });
+                let newVideos = mylistTable.getNewVideos(videos);
+
+                for (let aVideo of newVideos) {
+                    let nowTime = Date.now();
+                    if ((nowTime - startTime) > 5 * 60 * 1000) {
+                        isInTime = false;
+                        break;
+                    }
+                    if (counter % 100 == 0) {
+                        controlSheet.setResult(i, w3ctime.now(), "work in progress " + counter + "/" + newVideos.length);
+                    }
+
                     let videoDetail = new VideoDetail(aVideo.id);
                     let vd = videoDetail.getDetail();
                     if (vd.status == "ok") {
@@ -49,31 +67,32 @@ function getListedVideoInfoToTable(): void {
                                 vd.user_nickname = "";
                             }
                         }
-                        // データの並びを整えて１行分のデータとして準備する．
-                        row = ["title", "video_id", "watch_url",
-                            "description", "thumbnail_url",
-                            "first_retrieve", "length", "view_counter",
-                            "comment_num", "mylist_counter",
-                            "user_nickname"].map((name) => {
-                                return vd[name];
-                            });
+                        aVideo.title = vd["title"];
+                        aVideo.link = vd["watch_url"];
+                        aVideo.description = vd["description"];
+                        aVideo.thumbnail_url = vd["thumbnail_url"];
+                        aVideo.first_retrieve = vd["first_retrieve"];
+                        aVideo.length = Number(vd["length"]);
+                        aVideo.view_counter = Number(vd["view_counter"]);
+                        aVideo.comment_num = Number(vd["comment_num"]);
+                        aVideo.mylist_counter = Number(vd["mylist_counter"]);
                         let tags = videoDetail.getTags();
-                        row = row.concat([JSON.stringify(tags), mylist.getLink(), aVideo["updated"]]);
-                        rows.push(row);
-                    } else { // 動画がコミュニティ限定など公開されていない場合
-                        let compNum = MylistTable.videoColTitle.length - row.length;
-                        for (let i = 0; i < compNum; i++) {
-                            row.push("");
-                        }
-                        rows.push(row);
+                        aVideo.tag = JSON.stringify(tags);
+                        let list = [{ "title": mylist.getTitle(), "link": mylist.getLink(), "registered": mylist.getUpdated() }];
+                        aVideo.list_url = JSON.stringify(list);
+                        rows.push(aVideo);
                     }
-                });
-                if (rows.length > 0) {
-                    let rowsStr = arrayToStr(rows);
-                    let tagDbRowsStr = arrayToStr(tagDbRows);
-                    mylistTable.storeData(rowsStr);
+                    counter++;
                 }
-                controlSheet.setResult(i, w3ctime.now(), "done");
+
+                if (rows.length > 0) {
+                    mylistTable.storeData(rows);
+                }
+                if (counter == newVideos.length) {
+                    controlSheet.setResult(i, w3ctime.now(), "done");
+                } else {
+                    controlSheet.setResult(i, w3ctime.now(), "interrupted " + counter + "/" + newVideos.length);
+                }
             } else {
                 controlSheet.setResult(i, w3ctime.now(), "latest");
             }
