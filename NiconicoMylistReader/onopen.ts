@@ -1,4 +1,5 @@
 import { MylistTable } from "./fusiontables";
+import { ControlSheet } from "./sheet";
 
 /**
  * SpreadSheetを開いたときにonOpen()メソッドが呼ばれる．

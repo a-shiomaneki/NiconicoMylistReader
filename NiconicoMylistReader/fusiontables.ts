@@ -55,10 +55,10 @@ export class MylistTableRecord {
     description: string = "";
     thumbnail_url: URL = "";
     first_retrieve: IsoDate = "";
-    length: number = 0;
-    view_counter: number = 0;
-    comment_num: number = 0;
-    mylist_counter: number = 0;
+    length: string = "";
+    view_counter: string = "";
+    comment_num: string = "";
+    mylist_counter: string = "";
     user_nickname: string = "";
     tag: JsonArray = "[]";
     list_url: JsonList = "{}";

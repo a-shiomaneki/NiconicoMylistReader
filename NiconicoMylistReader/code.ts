@@ -60,11 +60,11 @@ function getListedVideoInfoToTable(): void {
                     let videoDetail = new VideoDetail(aVideo.id);
                     let vd = videoDetail.getDetail();
                     if (vd.status == "ok") {
-                        if (vd.user_nickname == undefined) {
-                            if (vd.ch_name != undefined) {
-                                vd.user_nickname = vd.ch_name;
+                        if (vd["user_nickname"] == undefined) {
+                            if (vd["ch_name"] != undefined) {
+                                vd["user_nickname"] = vd["ch_name"];
                             } else {
-                                vd.user_nickname = "";
+                                vd["user_nickname"] = "";
                             }
                         }
                         aVideo.title = vd["title"];
@@ -72,10 +72,11 @@ function getListedVideoInfoToTable(): void {
                         aVideo.description = vd["description"];
                         aVideo.thumbnail_url = vd["thumbnail_url"];
                         aVideo.first_retrieve = vd["first_retrieve"];
-                        aVideo.length = Number(vd["length"]);
-                        aVideo.view_counter = Number(vd["view_counter"]);
-                        aVideo.comment_num = Number(vd["comment_num"]);
-                        aVideo.mylist_counter = Number(vd["mylist_counter"]);
+                        aVideo.length = vd["length"];
+                        aVideo.view_counter = vd["view_counter"];
+                        aVideo.comment_num = vd["comment_num"];
+                        aVideo.mylist_counter = vd["mylist_counter"];
+                        aVideo.user_nickname = vd["user_nickname"];
                         let tags = videoDetail.getTags();
                         aVideo.tag = JSON.stringify(tags);
                         let list = [{ "title": mylist.getTitle(), "link": mylist.getLink(), "registered": mylist.getUpdated() }];
