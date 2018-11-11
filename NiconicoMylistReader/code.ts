@@ -3,6 +3,7 @@ import { NndMylist, VideoDetail } from "./niconicodouga";
 import { W3CTime, arrayToStr } from "./myutility";
 import { ControlSheet } from "./sheet";
 import { link } from "fs";
+import { listenerCount } from "cluster";
 
 /**
  * エントリーポイント
@@ -17,6 +18,7 @@ function main(): void {
 function getListedVideoInfoToTable(): void {
     let w3ctime = new W3CTime();
     let startTime = Date.now();
+    let startTimeStr = w3ctime.IsoFormat(startTime);
     let controlSheet = new ControlSheet();
     let mylistInfos = controlSheet.getMylistInfoWithResults();
     let tableInfos = controlSheet.getTableInfos();
@@ -73,6 +75,24 @@ function getListedVideoInfoToTable(): void {
                     }
                     counter++;
                 }
+                for (let aVideo of video.exists) {
+                    if (!isInTime(startTime)) break;
+                    showCounter(controlSheet, i, w3ctime.now(), counter, video.news.length + video.exists.length);
+
+                    let lists = JSON.parse(aVideo.list_url);
+                    let result = lists.some((aList) => {
+                        aList.link == mylist.link;
+                    });
+                    if (result) {
+                        let newList = {
+                            "title": mylist.getTitle(),
+                            "link": mylist.getLink(),
+                            "registered": startTimeStr
+                        }
+                        lists.push(newList);
+                    }
+                    counter++;
+                }
 
                 if (newRows.length > 0) {
                     mylistTable.storeData(newRows);
@@ -83,7 +103,7 @@ function getListedVideoInfoToTable(): void {
                 if (counter == video.news.length + video.exists.length) {
                     controlSheet.setResult(i, w3ctime.now(), "done");
                 } else {
-                    controlSheet.setResult(i, w3ctime.now(), "interrupted " + counter + "/" + video.news.length + video.exists.length);
+                    controlSheet.setResult(i, w3ctime.now(), "interrupted " + counter + "/" + (video.news.length + video.exists.length));
                 }
             } else {
                 controlSheet.setResult(i, w3ctime.now(), "latest");
