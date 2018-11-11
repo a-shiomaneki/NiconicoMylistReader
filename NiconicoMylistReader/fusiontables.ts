@@ -118,6 +118,8 @@ export class MylistTable {
             }
         } while (isDone === false);
     }
+    updateData(rows: MylistTableRecord[]) {
+    }
     createTable(name: string): string {
         let resource: { [key: string]: any } = {
             "name": name,
@@ -141,7 +143,15 @@ export class MylistTable {
                 case "list_url":
                     type = "STRING";
                     formatPattern = "STRING_JSON_LIST";
-                    columnJsonSchema = "";
+                    columnJsonSchema = JSON.stringify(
+                        {
+                            "type": "array",
+                            "properties": {
+                                "title": { "type": "string" },
+                                "link": { "type": "string", "format": "uri" },
+                                "registered": { "type": "string", "format": "date-time" }
+                            }
+                        });
                     break;
                 case "thumbnail_url":
                     type = "STRING";
@@ -154,9 +164,13 @@ export class MylistTable {
                     break;
                 case "tag":
                     type = "STRING";
-                    //formatPattern = "STRING_JSON_LIST";
-                    formatPattern = "STRING_JSON_TEXT";
-                    columnJsonSchema = "{ \"type\": \"array\" }";
+                    formatPattern = "STRING_JSON_LIST";
+                    //formatPattern = "STRING_JSON_TEXT";
+                    columnJsonSchema = JSON.stringify(
+                        {
+                            "type": "array",
+                            "items": { "type": "string" }
+                        });
                     break;
                 default:
                     type = "STRING";
@@ -188,7 +202,7 @@ export class MylistTable {
         this.tableId = response.tableId;
         return this.tableId;
     }
-    getNewVideos(videos: NndMylistVideoEntry[]): MylistTableRecord[] {
+    getNewAndBeUpdateVideos(videos: NndMylistVideoEntry[]): { news: MylistTableRecord[]; exists: MylistTableRecord[]; } {
         let sql = "SELECT id, list_url FROM " + this.tableId + ";";
         let rows: string[] = FusionTables.Query.sql(sql).rows;
         let ids: { [key: string]: string } = {};
@@ -199,19 +213,19 @@ export class MylistTable {
                 }
             }
         }
-        let results: MylistTableRecord[] = [];
+        let news: MylistTableRecord[] = [];
         let exists: MylistTableRecord[] = [];
         for (const aVideo of videos) {
             let id = aVideo["id"];
             let list_link = ids[id];
             let row = MylistTable.nndMylistVideoEntryToMylistTableRecord(aVideo);
             if (list_link == undefined) {
-                results.push(row);
+                news.push(row);
             } else {
                 exists.push(row);
             }
         }
-        return results;
+        return { news, exists };
     }
     static nndMylistVideoEntryToMylistTableRecord(entry: NndMylistVideoEntry) {
         let result = new MylistTableRecord();

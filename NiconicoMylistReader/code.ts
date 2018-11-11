@@ -15,7 +15,6 @@ function main(): void {
 
 
 function getListedVideoInfoToTable(): void {
-    let isInTime = true;
     let w3ctime = new W3CTime();
     let startTime = Date.now();
     let controlSheet = new ControlSheet();
@@ -43,30 +42,19 @@ function getListedVideoInfoToTable(): void {
                 w3ctime.isT2Latest(lastUpdate, lastEntryDate) ||
                 !/(done|latest)/.test(mylistInfos[i].result)) {
                 controlSheet.setResult(i, w3ctime.now(), "start");
-                let rows = [];
+                let newRows = [];
+                let existRows = [];
                 let tagDbRows = [];
-                let newVideos = mylistTable.getNewVideos(videos);
+                let video = mylistTable.getNewAndBeUpdateVideos(videos);
 
-                for (let aVideo of newVideos) {
-                    let nowTime = Date.now();
-                    if ((nowTime - startTime) > 5 * 60 * 1000) {
-                        isInTime = false;
-                        break;
-                    }
-                    if (counter % 100 == 0) {
-                        controlSheet.setResult(i, w3ctime.now(), "work in progress " + counter + "/" + newVideos.length);
-                    }
+                for (let aVideo of video.news) {
+                    if (!isInTime(startTime)) break;
+                    showCounter(controlSheet, i, w3ctime.now(), counter, video.news.length + video.exists.length);
 
                     let videoDetail = new VideoDetail(aVideo.id);
                     let vd = videoDetail.getDetail();
                     if (vd.status == "ok") {
-                        if (vd["user_nickname"] == undefined) {
-                            if (vd["ch_name"] != undefined) {
-                                vd["user_nickname"] = vd["ch_name"];
-                            } else {
-                                vd["user_nickname"] = "";
-                            }
-                        }
+                        vd = setNickname(vd);
                         aVideo.title = vd["title"];
                         aVideo.link = vd["watch_url"];
                         aVideo.description = vd["description"];
@@ -81,18 +69,21 @@ function getListedVideoInfoToTable(): void {
                         aVideo.tag = JSON.stringify(tags);
                         let list = [{ "title": mylist.getTitle(), "link": mylist.getLink(), "registered": mylist.getUpdated() }];
                         aVideo.list_url = JSON.stringify(list);
-                        rows.push(aVideo);
+                        newRows.push(aVideo);
                     }
                     counter++;
                 }
 
-                if (rows.length > 0) {
-                    mylistTable.storeData(rows);
+                if (newRows.length > 0) {
+                    mylistTable.storeData(newRows);
                 }
-                if (counter == newVideos.length) {
+                if (existRows.length > 0) {
+                    mylistTable.updateData(newRows);
+                }
+                if (counter == video.news.length + video.exists.length) {
                     controlSheet.setResult(i, w3ctime.now(), "done");
                 } else {
-                    controlSheet.setResult(i, w3ctime.now(), "interrupted " + counter + "/" + newVideos.length);
+                    controlSheet.setResult(i, w3ctime.now(), "interrupted " + counter + "/" + video.news.length + video.exists.length);
                 }
             } else {
                 controlSheet.setResult(i, w3ctime.now(), "latest");
@@ -105,3 +96,28 @@ function getListedVideoInfoToTable(): void {
     }
 }
 
+function setNickname(vd: { [key: string]: string }) {
+    if (vd["user_nickname"] == undefined) {
+        if (vd["ch_name"] != undefined) {
+            vd["user_nickname"] = vd["ch_name"];
+        } else {
+            vd["user_nickname"] = "";
+        }
+    }
+    return vd;
+}
+
+function isInTime(startTime: number): boolean {
+    let nowTime = Date.now();
+    if ((nowTime - startTime) < 5 * 60 * 1000) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function showCounter(controlSheet, i, now, counter, max) {
+    if (counter % 100 == 0) {
+        controlSheet.setResult(i, now, "work in progress " + counter + "/" + max);
+    }
+}
