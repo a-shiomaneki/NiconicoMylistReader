@@ -49,6 +49,7 @@ export type IsoDate = string;
 export type URL = string;
 
 export class MylistTableRecord {
+    rowid: string = "";
     title: string = "";
     id: string = "";
     link: URL = "";
@@ -61,7 +62,7 @@ export class MylistTableRecord {
     mylist_counter: string = "";
     user_nickname: string = "";
     tag: JsonArray = "[]";
-    list_url: JsonList = "{}";
+    list_url: JsonArray = "[]";
 }
 
 export class MylistTable {
@@ -117,6 +118,27 @@ export class MylistTable {
                 }
             }
         } while (isDone === false);
+    }
+    getDataByRowid(videos: MylistTableRecord[]) {
+        let rowids = videos.map((row) => { return row.rowid; });
+        let rowidsStr = videos.reduce((acc, cur) => {
+            return acc + ((acc) ? "," : "") + "\"" + cur.rowid + "\"";
+        }, "");
+        let selectCols = MylistTable.videoColTitle.reduce((acc, cur) => {
+            return acc + ((acc) ? "," : "") + cur;
+        }, "");
+        let sql = "SELECT " + selectCols + " FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr+");";
+        let rows: string[] = FusionTables.Query.sql(sql).rows;
+
+        let results: MylistTableRecord[] = [];
+        for (const row of rows) {
+            let record = new MylistTableRecord();
+            for (let i = 0; i < MylistTable.videoColTitle.length; i++) {
+                record[MylistTable.videoColTitle[i]] = row[i];
+            }
+            results.push(record);
+        }
+        return results;
     }
     updateData(rows: MylistTableRecord[]) {
     }
@@ -203,7 +225,7 @@ export class MylistTable {
         return this.tableId;
     }
     getNewAndBeUpdateVideos(videos: NndMylistVideoEntry[]): { news: MylistTableRecord[]; exists: MylistTableRecord[]; } {
-        let sql = "SELECT id, list_url FROM " + this.tableId + ";";
+        let sql = "SELECT id, rowid FROM " + this.tableId + ";";
         let rows: string[] = FusionTables.Query.sql(sql).rows;
         let ids: { [key: string]: string } = {};
         if (rows != undefined) {
@@ -217,12 +239,12 @@ export class MylistTable {
         let exists: MylistTableRecord[] = [];
         for (const aVideo of videos) {
             let id = aVideo["id"];
-            let list_link = ids[id];
             let row = MylistTable.nndMylistVideoEntryToMylistTableRecord(aVideo);
-            if (list_link == undefined) {
-                news.push(row);
-            } else {
+            row.rowid = ids[id];
+            if (id in ids) {
                 exists.push(row);
+            } else {
+                news.push(row);
             }
         }
         return { news, exists };

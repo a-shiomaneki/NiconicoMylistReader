@@ -18,7 +18,7 @@ function main(): void {
 function getListedVideoInfoToTable(): void {
     let w3ctime = new W3CTime();
     let startTime = Date.now();
-    let startTimeStr = w3ctime.IsoFormat(startTime);
+    let startTimeStr = w3ctime.IsoFormat(new Date(startTime));
     let controlSheet = new ControlSheet();
     let mylistInfos = controlSheet.getMylistInfoWithResults();
     let tableInfos = controlSheet.getTableInfos();
@@ -75,30 +75,36 @@ function getListedVideoInfoToTable(): void {
                     }
                     counter++;
                 }
-                for (let aVideo of video.exists) {
+                if (video.exists.length > 0) {
                     if (!isInTime(startTime)) break;
                     showCounter(controlSheet, i, w3ctime.now(), counter, video.news.length + video.exists.length);
 
-                    let lists = JSON.parse(aVideo.list_url);
-                    let result = lists.some((aList) => {
-                        aList.link == mylist.link;
-                    });
-                    if (result) {
-                        let newList = {
-                            "title": mylist.getTitle(),
-                            "link": mylist.getLink(),
-                            "registered": startTimeStr
+                    existRows = mylistTable.getDataByRowid(video.exists);
+                    for (let record of existRows) {
+
+                        let lists = JSON.parse(record.list_url);
+                        let hasSameList = lists.some((aList) => {
+                            return aList.link == mylist.link;
+                        });
+                        if (!hasSameList) {
+                            let newList = {
+                                "title": mylist.getTitle(),
+                                "link": mylist.getLink(),
+                                "registered": startTimeStr
+                            }
+                            lists.push(newList);
                         }
-                        lists.push(newList);
+                        record.list_url = JSON.stringify(lists);
+
+                        counter++;
                     }
-                    counter++;
                 }
 
                 if (newRows.length > 0) {
                     mylistTable.storeData(newRows);
                 }
                 if (existRows.length > 0) {
-                    mylistTable.updateData(newRows);
+                    mylistTable.updateData(existRows);
                 }
                 if (counter == video.news.length + video.exists.length) {
                     controlSheet.setResult(i, w3ctime.now(), "done");
