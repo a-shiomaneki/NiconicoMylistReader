@@ -144,7 +144,7 @@ function isInTime(startTime: number): boolean {
 }
 
 function showCounter(controlSheet, i, now, counter, max) {
-    if (counter % 100 == 0) {
+    if (counter % 20 == 0) {
         controlSheet.setResult(i, now, "work in progress " + counter + "/" + max);
     }
 }
