@@ -209,6 +209,7 @@ export class MylistTable {
                     break;
                 case "view_counter":
                 case "mylist_counter":
+                case "comment_num":
                     type = "NUMBER";
                     formatPattern = "NONE";
                     break;
@@ -255,11 +256,11 @@ export class MylistTable {
     getNewAndBeUpdateVideos(videos: NndMylistVideoEntry[]): { news: MylistTableRecord[]; exists: MylistTableRecord[]; } {
         let sql = "SELECT id, rowid FROM " + this.tableId + ";";
         let rows: string[] = FusionTables.Query.sql(sql).rows;
-        let ids: { [key: string]: string } = {};
+        let rowIdById: { [key: string]: string } = {};
         if (rows != undefined) {
             if (rows.length >= 1) {
                 for (const row of rows) {
-                    ids[row[0]] = row[1];
+                    rowIdById[row[0]] = row[1];
                 }
             }
         }
@@ -268,8 +269,8 @@ export class MylistTable {
         for (const aVideo of videos) {
             let id = aVideo["id"];
             let row = MylistTable.nndMylistVideoEntryToMylistTableRecord(aVideo);
-            row.rowid = ids[id];
-            if (id in ids) {
+            row.rowid = rowIdById[id];
+            if (id in rowIdById) {
                 exists.push(row);
             } else {
                 news.push(row);
