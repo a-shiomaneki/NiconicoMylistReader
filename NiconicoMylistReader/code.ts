@@ -75,13 +75,12 @@ function getListedVideoInfoToTable(): void {
                     }
                     counter++;
                 }
-                if (video.exists.length > 0) {
-                    if (!isInTime(startTime)) break;
+                if (video.exists.length > 0 && isInTime(startTime)) {
                     showCounter(controlSheet, i, w3ctime.now(), counter, video.news.length + video.exists.length);
 
                     existRows = mylistTable.getDataByRowid(video.exists);
                     for (let record of existRows) {
-
+                        if (!isInTime(startTime)) break;
                         let lists = JSON.parse(record.list_url);
                         let hasSameList = lists.some((aList) => {
                             return aList.link == mylist.link;
@@ -100,9 +99,11 @@ function getListedVideoInfoToTable(): void {
                 }
 
                 if (newRows.length > 0) {
+                    controlSheet.setResult(i, w3ctime.now(), "storing data...");
                     mylistTable.storeData(newRows);
                 }
                 if (existRows.length > 0) {
+                    controlSheet.setResult(i, w3ctime.now(), "updating data...");
                     mylistTable.updateData(existRows);
                 }
                 if (counter == video.news.length + video.exists.length) {
