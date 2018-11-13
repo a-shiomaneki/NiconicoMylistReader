@@ -81,14 +81,14 @@ export class MylistTableRecord {
     mylist_counter: string = "";
     user_nickname: string = "";
     tag: JsonArray = "[]";
-    list_url: JsonArray = "[]";
+    list: JsonArray = "[]";
 }
 
 export class MylistTable {
     tableId: string = "";
     static videoColTitle: ReadonlyArray<string> = ["title", "id", "link", "description",
         "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
-        "mylist_counter", "user_nickname", "tag", "list_url"];
+        "mylist_counter", "user_nickname", "tag", "list"];
 
     storeData(rows: MylistTableRecord[]): number {
         // データの並びを整えて１行分のデータとして準備する．

@@ -71,7 +71,7 @@ function getListedVideoInfoToTable(): void {
                         let tags = videoDetail.getTags();
                         aVideo.tag = JSON.stringify(tags);
                         let list = [{ "title": mylist.getTitle(), "link": mylist.getLink(), "registered": mylist.getUpdated() }];
-                        aVideo.list_url = JSON.stringify(list);
+                        aVideo.list = JSON.stringify(list);
                         newRows.push(aVideo);
                     }
                     counter++;
@@ -82,7 +82,7 @@ function getListedVideoInfoToTable(): void {
                     existRows = mylistTable.getDataByRowid(video.exists);
                     for (let record of existRows) {
                         if (!isInTime(startTime)) break;
-                        let lists = JSON.parse(record.list_url);
+                        let lists = JSON.parse(record.list);
                         let hasSameList = lists.some((aList) => {
                             return aList.link == mylist.link;
                         });
@@ -93,7 +93,7 @@ function getListedVideoInfoToTable(): void {
                                 "registered": startTimeStr
                             }
                             lists.push(newList);
-                            record.list_url = JSON.stringify(lists);
+                            record.list = JSON.stringify(lists);
                         }
                         counter++;
                     }
