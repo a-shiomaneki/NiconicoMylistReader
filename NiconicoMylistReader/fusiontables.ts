@@ -29,6 +29,19 @@ namespace FusionTables {
             "columnId": number
         }
     }
+    export interface TaskResource {
+        "kind": "fusiontables#task",
+        "taskId": number,
+        "started": boolean,
+        "progress": string,
+        "type": string
+    }
+    export interface TaskList {
+        "kind": "fusiontables#taskList",
+        "totalItems": number,
+        "nextPageToken": string,
+        "items": TaskResource[]
+    }
     export interface Table {
         importRows(tableId: string, rowsBlob: GoogleAppsScript.Base.Blob): { [key: string]: any };
         insert(resource: { [key: string]: any }): TableResource;
@@ -37,9 +50,14 @@ namespace FusionTables {
     export interface Query {
         sql(sql: string): { [key: string]: any };
     }
+    export interface Task {
+        get(tableId: string, taskId: string): Task;
+        list(tablesId: string): TaskList;
+    }
     export interface FusionTables {
         Table: Table;
         Query: Query;
+        Task: Task;
     }
 }
 declare var FusionTables: FusionTables.FusionTables;
@@ -72,35 +90,33 @@ export class MylistTable {
         "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
         "mylist_counter", "user_nickname", "tag", "list_url"];
 
-    storeData(rows: MylistTableRecord[]) {
+    storeData(rows: MylistTableRecord[]): number {
         // データの並びを整えて１行分のデータとして準備する．
         let arrayOfrowStrs: string[][] = [];
         for (const row of rows) {
             let str: string[] = [];
-            for(const name of MylistTable.videoColTitle) {
+            for (const name of MylistTable.videoColTitle) {
                 str.push(row[name]);
             }
             arrayOfrowStrs.push(str);
         }
         let rowsStr = arrayToStr(arrayOfrowStrs);
-        this._storeData(rowsStr);
-    }
 
-    _storeData(str: string): void {
         let rowsBlob: GoogleAppsScript.Base.Blob;
         let isDone: boolean = false;
+        let response: { [key: string]: any };
 
         do {
             try {
-                rowsBlob = Utilities.newBlob(str, "application/octet-stream");
-                FusionTables.Table.importRows(this.tableId, rowsBlob);
+                rowsBlob = Utilities.newBlob(rowsStr, "application/octet-stream");
+                response = FusionTables.Table.importRows(this.tableId, rowsBlob);
                 isDone = true;
                 Logger.log("importRows:OK");
             } catch (error) {
                 do {
                     try {
-                        rowsBlob = Utilities.newBlob(str, "application/octet-stream");
-                        FusionTables.Table.importRows(this.tableId, rowsBlob);
+                        rowsBlob = Utilities.newBlob(rowsStr, "application/octet-stream");
+                        response = FusionTables.Table.importRows(this.tableId, rowsBlob);
                         Logger.log("importRows:OK");
                     } catch (error) {
                         Logger.log(error);
@@ -120,6 +136,8 @@ export class MylistTable {
                 }
             }
         } while (isDone === false);
+        let numRowsReceived: number = response["numRowsReceived"];
+        return numRowsReceived;
     }
     getDataByRowid(videos: MylistTableRecord[]) {
         let rowids = videos.map((row) => { return row.rowid; });
@@ -130,7 +148,7 @@ export class MylistTable {
         let selectCols = videoColTitle.reduce((acc, cur) => {
             return acc + ((acc) ? "," : "") + cur;
         }, "");
-        let sql = "SELECT " + selectCols + " FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr+");";
+        let sql = "SELECT " + selectCols + " FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr + ");";
         let response = FusionTables.Query.sql(sql);
         let rows: string[] = response.rows;
 
@@ -150,7 +168,7 @@ export class MylistTable {
         }, "");
         let sql = "DELETE FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr + ");";
         let response = FusionTables.Query.sql(sql);
-        this.storeData(videos);
+        return this.storeData(videos);
     }
     createTable(name: string): string {
         let resource: { [key: string]: any } = {
@@ -277,6 +295,12 @@ export class MylistTable {
                 Logger.log(e);
                 throw e;
             }
+        }
+    }
+    waitTask() {
+        while (true) {
+            let taskList = FusionTables.Task.list(this.tableId);
+            if (!taskList.items) break;
         }
     }
 }

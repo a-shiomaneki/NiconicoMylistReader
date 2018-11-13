@@ -47,6 +47,7 @@ function getListedVideoInfoToTable(): void {
                 let newRows = [];
                 let existRows = [];
                 let tagDbRows = [];
+                mylistTable.waitTask();
                 let video = mylistTable.getNewAndBeUpdateVideos(videos);
 
                 for (let aVideo of video.news) {
@@ -100,11 +101,11 @@ function getListedVideoInfoToTable(): void {
 
                 if (newRows.length > 0) {
                     controlSheet.setResult(i, w3ctime.now(), "storing data...");
-                    mylistTable.storeData(newRows);
+                    let numRowsReceived = mylistTable.storeData(newRows);
                 }
                 if (existRows.length > 0) {
                     controlSheet.setResult(i, w3ctime.now(), "updating data...");
-                    mylistTable.updateData(existRows);
+                    let numRowsReceived = mylistTable.updateData(existRows);
                 }
                 if (counter == video.news.length + video.exists.length) {
                     controlSheet.setResult(i, w3ctime.now(), "done");
