@@ -93,9 +93,8 @@ function getListedVideoInfoToTable(): void {
                                 "registered": startTimeStr
                             }
                             lists.push(newList);
+                            record.list_url = JSON.stringify(lists);
                         }
-                        record.list_url = JSON.stringify(lists);
-
                         counter++;
                     }
                 }

@@ -1,5 +1,6 @@
 ﻿import { arrayToStr } from "./myutility";
 import { NndMylistVideoEntry, NndMylist } from "./niconicodouga";
+import { MylistInfo } from "./sheet";
 
 namespace FusionTables {
     export interface TableResource {
@@ -67,7 +68,7 @@ export class MylistTableRecord {
 
 export class MylistTable {
     tableId: string = "";
-    static videoColTitle: string[] = ["title", "id", "link", "description",
+    static videoColTitle: ReadonlyArray<string> = ["title", "id", "link", "description",
         "thumbnail_url", "first_retrieve", "length", "view_counter", "comment_num",
         "mylist_counter", "user_nickname", "tag", "list_url"];
 
@@ -75,9 +76,10 @@ export class MylistTable {
         // データの並びを整えて１行分のデータとして準備する．
         let arrayOfrowStrs: string[][] = [];
         for (const row of rows) {
-            let str: string[] = MylistTable.videoColTitle.map((name) => {
-                return row[name];
-            });
+            let str: string[] = [];
+            for(const name of MylistTable.videoColTitle) {
+                str.push(row[name]);
+            }
             arrayOfrowStrs.push(str);
         }
         let rowsStr = arrayToStr(arrayOfrowStrs);
@@ -124,23 +126,31 @@ export class MylistTable {
         let rowidsStr = videos.reduce((acc, cur) => {
             return acc + ((acc) ? "," : "") + "\"" + cur.rowid + "\"";
         }, "");
-        let selectCols = MylistTable.videoColTitle.reduce((acc, cur) => {
+        let videoColTitle = Object.getOwnPropertyNames(videos[0]);
+        let selectCols = videoColTitle.reduce((acc, cur) => {
             return acc + ((acc) ? "," : "") + cur;
         }, "");
         let sql = "SELECT " + selectCols + " FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr+");";
-        let rows: string[] = FusionTables.Query.sql(sql).rows;
+        let response = FusionTables.Query.sql(sql);
+        let rows: string[] = response.rows;
 
         let results: MylistTableRecord[] = [];
         for (const row of rows) {
             let record = new MylistTableRecord();
-            for (let i = 0; i < MylistTable.videoColTitle.length; i++) {
-                record[MylistTable.videoColTitle[i]] = row[i];
+            for (let i = 0; i < videoColTitle.length; i++) {
+                record[videoColTitle[i]] = row[i];
             }
             results.push(record);
         }
         return results;
     }
-    updateData(rows: MylistTableRecord[]) {
+    updateData(videos: MylistTableRecord[]) {
+        let rowidsStr = videos.reduce((acc, cur) => {
+            return acc + ((acc) ? "," : "") + "\"" + cur.rowid + "\"";
+        }, "");
+        let sql = "DELETE FROM " + this.tableId + " WHERE rowid IN (" + rowidsStr + ");";
+        let response = FusionTables.Query.sql(sql);
+        this.storeData(videos);
     }
     createTable(name: string): string {
         let resource: { [key: string]: any } = {
