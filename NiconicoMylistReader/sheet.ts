@@ -55,6 +55,11 @@ export class ControlSheet {
     setupControlSheet() {
         const mylistInfoColumnTitles = ["マイリスト", "タイトル", "ユーザー名", "マイリストアップデート", "動画最新登録", "処理", "処理状況"];
         const tableColumnTitles = ["データベース種別", "ファイル名", "データベースID", "処理状況"];
+        const tableNameAndFilename = [""]
+        this.sheet.getRange(1, 1, 1, mylistInfoColumnTitles.length).setValues([mylistInfoColumnTitles]);
+        this.sheet.getRange(1, mylistInfoColumnTitles.length + 1, 1, tableColumnTitles.length).setValues([tableColumnTitles]);
+        this.sheet.getRange(2, mylistInfoColumnTitles.length + 1, 1, 2).setValues([["videoInfoTable", "マイリスト動画データベース"]]);
+
         const rowNum = 21;
 
         let allRange = this.sheet.getRange(1, 1, this.sheet.getMaxRows(), this.sheet.getMaxColumns());
@@ -68,7 +73,6 @@ export class ControlSheet {
         this.sheet.setColumnWidths(1, 11, 135);
         allRange.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
 
-        this.sheet.getRange(1, 1, 1, mylistInfoColumnTitles.length).setValues([mylistInfoColumnTitles]);
         let mylistInfoRange = this.sheet.getRange(1, 1, rowNum, mylistInfoColumnTitles.length)
 
         mylistInfoRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
@@ -78,7 +82,6 @@ export class ControlSheet {
             .setSecondRowColor('#e0f7fa')
             .setFooterRowColor(null);
 
-        this.sheet.getRange(1, mylistInfoColumnTitles.length + 1, 1, tableColumnTitles.length).setValues([tableColumnTitles]);
         let tableRange = this.sheet.getRange(1, mylistInfoColumnTitles.length + 1, 3, tableColumnTitles.length)
         tableRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
         let tableBanding = tableRange.getBandings()[0];
