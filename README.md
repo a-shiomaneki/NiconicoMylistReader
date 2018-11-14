@@ -1,18 +1,24 @@
 # NiconicoMylistReader
 ## これはなに？
-ニコニコ動画の公開マイリストをGoogle Spreadsheet に取り込むGoogle App Script です．ニコニコ動画ではマイリスト内の動画を検索する機能がなく，マイリストしたにもかかわらず求める動画にたどり着くのが困難です．そこで，動画情報をGoogle Spreadsheet に取り込んでしまうことで，スプレッシートの検索機能で求める動画を探すできるようにする事を目的としています．
+ニコニコ動画の公開マイリストを[Google Spreadsheet][spreadsheet]に取り込む[Google App Script][gas] です．ニコニコ動画ではマイリスト内の動画を検索する機能がなく，マイリストしたにもかかわらず求める動画にたどり着くのが困難です．そこで，動画情報をGoogle Spreadsheet に取り込んでしまうことで，スプレッシートの検索機能で求める動画を探すできるようにする事を目的としています．
 
 取り込むのはマイリスト内の動画情報だけで，動画ファイルを取り込むことはありません．
 ただし，サムネ画像は取り込みます．
 
+## UIの概要
+1. UIは[Google Spreadsheet][spreadsheet]と[FusionTables][fusiontables]で構成されています．
+1. Google Spreadsheet（シート名「コントロールシート」）はマイリストなどの設定値の保持します． コントロールシートにはカスタムメニュー「マイリストリーダー」があり，「マイリスト取得」や「データベース削除」などの作業をここから呼び出します．
+![コントロールシート](./images/control_sheet.png =x200 "コントロールシート")
+1. データの閲覧や検索はGoogle FusionTablesで作成したデータベースで行います．
+![マイリスト動画データベース](./images/movie_db.png =x200 "マイリスト動画データベース")
+
 ## 導入方法
 1. マイリストIDの取得
-    1. 取り込みたいマイリストを表示し，URL末尾にあるマイリストIDを調べておきます．
+    1. 取り込みたいマイリストのURLを調べておきます．
         
         **例**
         >http://www.nicovideo.jp/my/mylist/#/54869962
         >
-        >　このURLの末尾54869962がこのマイリストの*マイリストID*
 
 1. Google Spread Sheetの準備
     1. マイリスト情報を取り込むGoogle Spreadsheetを用意します．
@@ -32,3 +38,7 @@
 
 ## 残されている問題
 1. マイリスト内の動画が多いと規定の処理時間を越えてしまうためエラーとなってしまいます．一括処理できるのは，おおよそ1000動画以内のようです．
+
+[gas]:https://developers.google.com/apps-script/
+[spreadsheet]:https://developers.google.com/apps-script/reference/spreadsheet/
+[fusiontables]:https://developers.google.com/apps-script/advanced/fusion-tables
