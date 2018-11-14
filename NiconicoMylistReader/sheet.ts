@@ -37,8 +37,13 @@ export class ControlSheet {
     sheet: GoogleAppsScript.Spreadsheet.Sheet;
     mylistInfoOffset: number;
     tableInfoOffset: number;
+    readonly name: string = "コントロールシート";
     constructor() {
-        this.sheet = SpreadsheetApp.getActive().getSheetByName("コントロールシート");
+        this.sheet = SpreadsheetApp.getActive().getSheetByName(this.name);
+        if (!this.sheet) {
+            this.sheet = SpreadsheetApp.getActive().insertSheet().setName(this.name);
+            this.setupControlSheet();
+        }
         this.mylistInfoOffset = 0;
         let offsets: number[] = [];
         for (let key in MylistInfo.columnOffset) {
@@ -46,6 +51,43 @@ export class ControlSheet {
         }
         let maxCol = Math.max.apply(null, offsets);
         this.tableInfoOffset = maxCol + 1;
+    }
+    setupControlSheet() {
+        const mylistInfoColumnTitles = ["マイリスト", "タイトル", "ユーザー名", "マイリストアップデート", "動画最新登録", "処理", "処理状況"];
+        const tableColumnTitles = ["データベース種別", "ファイル名", "データベースID", "処理状況"];
+        const rowNum = 21;
+
+        let allRange = this.sheet.getRange(1, 1, this.sheet.getMaxRows(), this.sheet.getMaxColumns());
+        allRange.clearFormat();
+        let allBandings = allRange.getBandings();
+        for (let binding of allBandings) {
+            binding.remove();
+        }
+
+        allRange.activate();
+        this.sheet.setColumnWidths(1, 11, 135);
+        allRange.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+
+        this.sheet.getRange(1, 1, 1, mylistInfoColumnTitles.length).setValues([mylistInfoColumnTitles]);
+        let mylistInfoRange = this.sheet.getRange(1, 1, rowNum, mylistInfoColumnTitles.length)
+
+        mylistInfoRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+        let mylistInfoBanding = mylistInfoRange.getBandings()[0];
+        mylistInfoBanding.setHeaderRowColor('#4dd0e1')
+            .setFirstRowColor('#ffffff')
+            .setSecondRowColor('#e0f7fa')
+            .setFooterRowColor(null);
+
+        this.sheet.getRange(1, mylistInfoColumnTitles.length + 1, 1, tableColumnTitles.length).setValues([tableColumnTitles]);
+        let tableRange = this.sheet.getRange(1, mylistInfoColumnTitles.length + 1, 3, tableColumnTitles.length)
+        tableRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+        let tableBanding = tableRange.getBandings()[0];
+        tableBanding.setHeaderRowColor('#f46524')
+            .setFirstRowColor('#ffffff')
+            .setSecondRowColor('#ffe6dd')
+            .setFooterRowColor(null);
+
+        this.sheet.setFrozenRows(1);
     }
     getMylistInfoWithResults(): MylistInfo[] {
         let mylistInfos: MylistInfo[] = [];
