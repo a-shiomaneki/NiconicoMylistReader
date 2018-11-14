@@ -30,18 +30,22 @@ function getListedVideoInfoToTable(): void {
         mylistTable.tableId = tableInfos.videoInfoTable.id;
     }
     controlSheet.setLinkTableIdsFilename();
-    for (let i = 0; i < mylistInfos.length && isInTime; i++) {
-        let mylistInfo = mylistInfos[i].idOrUrl;
-        let lastUpdate = mylistInfos[i].last_entry;
+    for (let i = 0; i < mylistInfos.length && isInTime(startTime); i++) {
+        let mylistLink = mylistInfos[i].idOrUrl;
+        let lastEntry = mylistInfos[i].last_entry;
         try {
-            let mylist = new NndMylist(mylistInfo);
+            let mylist = new NndMylist(mylistLink);
             let videos = mylist.getVideos();
+            if (mylistLink != mylist.getLink()) {
+                mylistLink = mylist.getLink();
+                controlSheet.setMylistLink(i, mylistLink);
+            }
             let lastEntryDate = videos[0]["published"];
             controlSheet.setMylistInfo(i, mylist.getTitle(), mylist.getAuthor(), mylist.getUpdated());
             controlSheet.setlastEntryDate(i, lastEntryDate);
             let counter = 0;
-            if (lastUpdate === "" ||
-                w3ctime.isT2Latest(lastUpdate, lastEntryDate) ||
+            if (lastEntry === "" ||
+                w3ctime.isT2Latest(lastEntry, lastEntryDate) ||
                 !/(done|latest)/.test(mylistInfos[i].result)) {
                 controlSheet.setResult(i, w3ctime.now(), "start");
                 let newRows = [];

@@ -68,6 +68,10 @@ export class ControlSheet {
         this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["last_entry"] + 1, 1, 1).
             setValues([[last_entry]]);
     }
+    setMylistLink(i: number, link: string) {
+        this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["idOrUrl"] + 1, 1, 1).
+            setValues([[link]]);
+    }
     setMylistInfo(i: number, title: string, author: string, updated: string) {
         this.sheet.getRange(2 + i, this.mylistInfoOffset + MylistInfo.columnOffset["title"] + 1, 1, 3).
             setValues([[title, author, updated]]);
