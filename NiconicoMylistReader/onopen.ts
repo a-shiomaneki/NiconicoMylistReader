@@ -39,40 +39,6 @@ function deleteTable() {
 }
 
 function setupControlSheet() {
-    const mylistInfoColumnTitles = ["マイリスト", "タイトル", "ユーザー名", "マイリストアップデート", "動画最新登録", "処理", "処理状況"];
-    const tableColumnTitles = ["データベース種別", "ファイル名", "データベースID", "処理状況"];
-    const rowNum = 21;
-
-    let sheet = new ControlSheet().sheet;
-    let allRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
-    allRange.clearFormat();
-    let allBandings = allRange.getBandings();
-    for (let binding of allBandings) {
-        binding.remove();
-    }
-
-    allRange.activate();
-    sheet.setColumnWidths(1, 11, 135);
-    allRange.setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
-
-    sheet.getRange(1, 1, 1, mylistInfoColumnTitles.length).setValues([mylistInfoColumnTitles]);
-    let mylistInfoRange = sheet.getRange(1, 1, rowNum, mylistInfoColumnTitles.length)
-
-    mylistInfoRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
-    let mylistInfoBanding = mylistInfoRange.getBandings()[0];
-    mylistInfoBanding.setHeaderRowColor('#4dd0e1')
-        .setFirstRowColor('#ffffff')
-        .setSecondRowColor('#e0f7fa')
-        .setFooterRowColor(null);
-
-    sheet.getRange(1, mylistInfoColumnTitles.length + 1, 1, tableColumnTitles.length).setValues([tableColumnTitles]);
-    let tableRange = sheet.getRange(1, mylistInfoColumnTitles.length + 1, 3, tableColumnTitles.length)
-    tableRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
-    let tableBanding = tableRange.getBandings()[0];
-    tableBanding.setHeaderRowColor('#f46524')
-        .setFirstRowColor('#ffffff')
-        .setSecondRowColor('#ffe6dd')
-        .setFooterRowColor(null);
-
-    sheet.setFrozenRows(1);
+    let controlSheet = new ControlSheet();
+    controlSheet.setupControlSheet();
 }
