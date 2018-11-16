@@ -4,4 +4,4 @@
 *.lock
 /NiconicoMylistReader/obj/*
 /NiconicoMylistReader/*.js.map
-
+/NiconicoMylistReader/*.njsproj.user
