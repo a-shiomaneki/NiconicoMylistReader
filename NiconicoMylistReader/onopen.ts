@@ -1,29 +1,32 @@
 import { MylistTable } from "./fusiontables";
 import { ControlSheet } from "./sheet";
 
-/**
- * SpreadSheetを開いたときにonOpen()メソッドが呼ばれる．
- */
+function onInstall(e) {
+    onOpen(e);
+}
 
-function onOpen(): void {
-    let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+function onOpen(e) {
+    if (e && e.authMode == ScriptApp.AuthMode.NONE) {
+        var menu = SpreadsheetApp.getUi().createMenu("マイリストリーダー")
+            .addItem("マイリスリーダー有効化", "askEnabled")
+            .addToUi();
+    } else {
+        var trigger = SpreadsheetApp.getUi().createMenu("トリガー")
+            .addItem("毎時取得トリガー有効化", "createTimeDrivenTriggers")
+            .addItem("トリガー削除", "deleteTrigger")
+        var menu = SpreadsheetApp.getUi().createMenu("マイリストリーダー")
+            .addItem("マイリス取得", "getListedVideoInfoToTable")
+            .addSeparator()
+            .addSubMenu(trigger)
+            .addItem("データベース削除", "deleteTable")
+            .addItem("コントロールシートの初期化", "setupControlSheet")
+            .addToUi();
+    }
+}
 
-    /* Spreadsheetにメニューを作成する．*/
-    let entries = [
-        {
-            name: "マイリス取得",
-            functionName: "getListedVideoInfoToTable"
-        },
-        {
-            name: "データベース削除",
-            functionName: "deleteTable"
-        },
-        {
-            name: "コントロールシートの初期化",
-            functionName: "setupControlSheet"
-        }
-    ];
-    spreadsheet.addMenu("マイリスリーダー", entries);
+function askEnabled() {
+    let ui = SpreadsheetApp.getUi();
+    ui.alert("マイリストリーダー", "マイリストリーダーが有効になりました．", ui.ButtonSet.OK);
 }
 
 function deleteTable() {
@@ -41,4 +44,19 @@ function deleteTable() {
 function setupControlSheet() {
     let controlSheet = new ControlSheet();
     controlSheet.setupControlSheet();
+}
+
+function createTimeDrivenTriggers() {
+    deleteTrigger();
+    ScriptApp.newTrigger("main")
+        .timeBased()
+        .everyHours(1)
+        .create();
+}
+
+function deleteTrigger() {
+    let allTriggers = ScriptApp.getProjectTriggers();
+    for (let trigger of allTriggers) {
+        ScriptApp.deleteTrigger(trigger);
+    }
 }
