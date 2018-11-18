@@ -11,15 +11,15 @@ function onOpen(e) {
             .addItem("マイリスリーダー有効化", "askEnabled")
             .addToUi();
     } else {
-        var trigger = SpreadsheetApp.getUi().createMenu("トリガー")
-            .addItem("毎時取得トリガー有効化", "createTimeDrivenTriggers")
-            .addItem("トリガー削除", "deleteTrigger")
+        var trigger = SpreadsheetApp.getUi().createMenu("毎時取得トリガー")
+            .addItem("トリガーを設定", "createTimeDrivenTriggers")
+            .addItem("トリガーを削除", "deleteTrigger")
         var menu = SpreadsheetApp.getUi().createMenu("マイリストリーダー")
             .addItem("マイリス取得", "getListedVideoInfoToTable")
             .addSeparator()
             .addSubMenu(trigger)
             .addItem("データベース削除", "deleteTable")
-            .addItem("コントロールシートの初期化", "setupControlSheet")
+            .addItem("コントロールシートの書式を設定", "setupControlSheet")
             .addToUi();
     }
 }
